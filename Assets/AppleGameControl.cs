@@ -37,6 +37,7 @@ public class AppleGameControl : NetworkBehaviour
 
     void ScaleUp()
     {
+
         ScaleLimit--;
         if (ScaleLimit == 0)
         {
