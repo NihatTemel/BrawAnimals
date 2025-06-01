@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c509fb9efd165e146ad1f63b391bd789
+guid: bd6ed973e0323714c9d3564ea68aacda
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,7 +31,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: SINCAP_KUREK_HIGH_JUMP_ANIMATIONS_2
+      name: RAKUN_LONG_JUMP_ANIM
       takeName: Scene
       internalID: -623603649343465320
       firstFrame: 0
@@ -42,7 +42,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -122,7 +122,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: c7882a6627d464e45a770f8fb5c412b5, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1

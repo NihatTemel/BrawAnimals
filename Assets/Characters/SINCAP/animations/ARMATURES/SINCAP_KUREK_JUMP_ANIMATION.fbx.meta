@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d4ce1aeb05fdd2d4aaa526ec44ba3e1a
+guid: fc14e246be701434faf2e9327e7207c8
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -34,7 +34,7 @@ ModelImporter:
       name: SINCAP_KUREK_JUMP_ANIMATION
       takeName: Scene
       internalID: -623603649343465320
-      firstFrame: 0
+      firstFrame: 1
       lastFrame: 16
       wrapMode: 0
       orientationOffsetY: 0

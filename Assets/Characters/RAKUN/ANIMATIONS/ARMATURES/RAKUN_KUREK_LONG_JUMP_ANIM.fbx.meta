@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c064183817e9ffa4ea2e3838fdfa5292
+guid: 058a5a15d609ded4a8ceeadbfbec277a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,7 +31,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: RAKUN_HIHG_JUMP_ANIMATION
+      name: RAKUN_KUREK_LONG_JUMP_ANIM
       takeName: Scene
       internalID: -623603649343465320
       firstFrame: 0
@@ -42,7 +42,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

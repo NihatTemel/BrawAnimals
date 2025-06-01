@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ce6a966f3108c234983149b9068230f2
+guid: 0dc0a34d4aef58947975201d8aa77696
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,10 +31,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: SINCAP_BOW_HIHG_JUMP_ANIMATION
+      name: SINCAP_LONG_JUMP_ANIMATION
       takeName: Scene
       internalID: -623603649343465320
-      firstFrame: 0
+      firstFrame: 1
       lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
@@ -42,7 +42,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

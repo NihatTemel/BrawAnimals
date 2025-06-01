@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0649a9ec9455d8b4b820e84aacd72d83
+guid: 4fed852183d56494ea27526f94784474
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -34,7 +34,7 @@ ModelImporter:
       name: SINCAP_BOW_JUMP_ANIMATION
       takeName: Scene
       internalID: -623603649343465320
-      firstFrame: 0
+      firstFrame: 1
       lastFrame: 16
       wrapMode: 0
       orientationOffsetY: 0

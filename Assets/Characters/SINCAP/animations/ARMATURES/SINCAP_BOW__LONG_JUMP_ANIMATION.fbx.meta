@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 93f25b5ced5bd4045af9132c2b144dc5
+guid: 95c9bd01dc64544478ab05e4ab07647f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: RAKUN_JUMP_ANIMATION
+      name: SINCAP_BOW__LONG_JUMP_ANIMATION
       takeName: Scene
       internalID: -623603649343465320
-      firstFrame: 0
-      lastFrame: 16
+      firstFrame: 1
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -122,7 +122,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: c7882a6627d464e45a770f8fb5c412b5, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
