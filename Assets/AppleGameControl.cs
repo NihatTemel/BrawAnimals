@@ -7,6 +7,25 @@ public class AppleGameControl : NetworkBehaviour
 
     int ScaleLimit = 2;
 
+    public GameObject Kurek;
+
+    public bool weaponactive = false;
+
+    public float weaponactivelimit = 5;
+    public float weaponactivecurrent = 0;
+
+    // 5 attack
+    // 6 attack
+    // 7 idle
+    // 8 walk
+    // 9 jump
+    // 10 run
+
+    public Animator animator;
+    public AnimationClip[] animationClips;
+
+
+
 
     void Start()
     {
@@ -17,6 +36,33 @@ public class AppleGameControl : NetworkBehaviour
     void Update()
     {
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
+
+
+
+
+        if (Input.GetKeyDown(KeyCode.V) && !weaponactive)
+        {
+            weaponactive = true;
+            CmdSetKurekVisible(true);
+        }
+
+        if (!weaponactive) 
+        {
+            if (weaponactivecurrent < 5) 
+            {
+                weaponactivecurrent += Time.deltaTime;
+            }
+            else 
+            {
+                weaponactive = true;
+                CmdSetKurekVisible(true);
+            }
+            
+            
+        }
+
+        GetComponent<PlayerMainController>().weaponactive = weaponactive;
+
     }
 
 
@@ -73,6 +119,17 @@ public class AppleGameControl : NetworkBehaviour
         ScaleUp();
     }
 
-    
+    [Command]
+    void CmdSetKurekVisible(bool visible)
+    {
+        RpcSetKurekVisible(visible);
+    }
+    [ClientRpc]
+    void RpcSetKurekVisible(bool visible)
+    {
+        if (Kurek != null)
+            Kurek.SetActive(visible);
+    }
+
 
 }
