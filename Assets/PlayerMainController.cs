@@ -114,4 +114,7 @@ public class PlayerMainController : NetworkBehaviour
         if (!animator.GetCurrentAnimatorStateInfo(0).IsName(stateName)) // aynýysa tekrar oynatma
             animator.Play(stateName, layer);
     }
+
+    
+   
 }
