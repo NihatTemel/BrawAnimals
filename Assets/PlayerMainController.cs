@@ -35,8 +35,15 @@ public class PlayerMainController : NetworkBehaviour
     public TMP_Text nametext;
     [SyncVar] public string playername;
 
+    [Header("Attack")]
 
     public bool weaponactive = false;
+    public float weaponactivelimit = 5;
+    public float weaponactivecurrent = 0;
+    public GameObject Weapon;
+    public bool isattacking = false;
+
+    
 
     private void Start()
     {
@@ -51,6 +58,7 @@ public class PlayerMainController : NetworkBehaviour
         CharacterCamera = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<Camera>();
         if (transform.root.GetComponent<OnlinePrefabController>()._local)
             CharacterCamera.gameObject.SetActive(true);
+
 
         StaminaImg = GameObject.Find("Stamina").GetComponent<Image>();
         controller = GetComponent<CharacterController>();
@@ -146,10 +154,48 @@ public class PlayerMainController : NetworkBehaviour
 
         if (nametext != null)
             nametext.transform.LookAt(CharacterCamera.transform);
-
+        AttackActive();
+        AttackPlayer();
     }
 
+    void AttackActive() 
+    {
+        if (!weaponactive)
+        {
+            if (weaponactivecurrent < weaponactivelimit)
+            {
+                weaponactivecurrent += Time.deltaTime;
+            }
+            else
+            {
+                weaponactive = true;
+                CmdSetWeaponVisible(true);
+            }
 
+
+        }
+    }
+
+    void AttackPlayer() 
+    {
+        if (Input.GetMouseButtonDown(0) && !isattacking && weaponactive) 
+        {
+            weaponactivecurrent = 0;
+            PlayAnimationByIndex(5);
+
+            float attackDuration = currentAnimationClips[5].length;
+
+            Invoke("attackEnd", attackDuration);
+
+        }
+    }
+
+    void attackEnd() 
+    {
+        isattacking = false;
+        weaponactive = false;
+        CmdSetWeaponVisible(false);
+    }
 
     public void PlayAnimationByIndex(int index)
     {
@@ -159,11 +205,26 @@ public class PlayerMainController : NetworkBehaviour
 
         string stateName = currentAnimationClips[index].name;
 
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName(stateName) && !isattacking) 
+        {
+            if(index>4)
+                isattacking = true;
             animator.Play(stateName, layer);
+
+        }
     }
 
-
+    [Command]
+    void CmdSetWeaponVisible(bool visible)
+    {
+        RpcSetWeaponVisible(visible);
+    }
+    [ClientRpc]
+    void RpcSetWeaponVisible(bool visible)
+    {
+        if (Weapon != null)
+            Weapon.SetActive(visible);
+    }
     /*[Command(requiresAuthority = false)]
     void CmdSetPlayerName()
     {

@@ -2,20 +2,28 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 using TMPro;
+using UnityEngine.UI;
 public class AppleGameCanvas : NetworkBehaviour
 {
 
+    
+
     public GameObject PlayerListRoot;
     public OnlinePrefabLobbyController[] Players;
-
+    public Image KurekFillImg;
+    public float KurekFillTimer;  // 1 = full(recently used)  <--->  0 = end
+    public TMP_Text KurekFillText;
     void Start()
     {
         InvokeRepeating(nameof(RefreshPlayers), 0f, 0.5f); // Her 2 saniyede bir kontrol
     }
 
+    
+
     void RefreshPlayers()
     {
         Players = FindObjectsByType<OnlinePrefabLobbyController>(FindObjectsSortMode.None);
+
 
         if (Players == null || Players.Length == 0)
         {
