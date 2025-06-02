@@ -2,17 +2,12 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 using TMPro;
-using UnityEditor;
+
 public class AppleGameControl : NetworkBehaviour
 {
-
-
-    [SyncVar]public int applecount=1;
-
-    int ScaleLimit = 5;
+    [SyncVar(hook = nameof(OnAppleCountChanged))] public int applecount = 1;
 
     public GameObject Kurek;
-
     public bool weaponactive = false;
     public float weaponactivelimit = 5;
     public float weaponactivecurrent = 0;
@@ -26,94 +21,123 @@ public class AppleGameControl : NetworkBehaviour
 
     public GameObject appleObj;
 
+    private Vector3 baseScale = Vector3.one;
+    private float scalePerStep = 0.3f;
+    private int applesPerScaleStep = 3;
+
+    private int previousStep = 0;
+
     void Start()
     {
         GetComponent<PlayerMainController>().Weapon = Kurek;
+
         CanvasGameScene = GameObject.Find("CanvasGameScene");
         KurekImgFill = CanvasGameScene.GetComponent<AppleGameCanvas>().KurekFillImg;
         KurekFillText = CanvasGameScene.GetComponent<AppleGameCanvas>().KurekFillText;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
-
 
         weaponactive = GetComponent<PlayerMainController>().weaponactive;
         weaponactivelimit = GetComponent<PlayerMainController>().weaponactivelimit;
         weaponactivecurrent = GetComponent<PlayerMainController>().weaponactivecurrent;
         isattacking = GetComponent<PlayerMainController>().isattacking;
 
-
-        if (Input.GetKeyDown(KeyCode.U)) 
+        if (Input.GetKeyDown(KeyCode.U))
         {
-            CollectApple();
+            CmdCollectApple();
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
-            LoseAplleHelper();
+            CmdLoseApple();
         }
-
 
         UpdateCooldownUI();
         AttackEnemy();
     }
 
-    
-
-    void AttackEnemy() 
+    void AttackEnemy()
     {
-        if (isattacking) 
+        if (!isattacking) return;
+
+        if (Kurek.GetComponent<KurekTrigger>().enemy != null)
         {
-            if (Kurek.GetComponent<KurekTrigger>().enemy != null) 
+            GameObject enemy = Kurek.GetComponent<KurekTrigger>().enemy;
+            if (enemy == this.gameObject) return;
+
+            var control = enemy.GetComponent<AppleGameControl>();
+            if (control.canGetHit)
             {
-                GameObject enemy = Kurek.GetComponent<KurekTrigger>().enemy;
-                if (enemy == this.gameObject)
-                    enemy = null;
+                enemy.GetComponent<PlayerMainController>().canMove = false;
 
-                var control = enemy.GetComponent<AppleGameControl>();
-                if (control.canGetHit)
-                {
-                    control.canGetHit = false;
-                    control.LoseApple();
-                    //control.GetHit();
-                }
-
-
-                Debug.Log("hit player" + enemy.gameObject.name);
+                control.canGetHit = false;
+                control.CmdLoseApple();
+                Debug.Log("hit player " + enemy.gameObject.name);
             }
         }
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdLoseApple()
+    {
+        canGetHit = false;
+        GetComponent<PlayerMainController>().canMove = false;
+        int n = applecount - ((applecount) / 4);
 
-    [Server]
+
+        applecount = applecount / 4;
+        applecount = Mathf.Max(0, applecount - 1);
+
+        for (int i = 0; i < n; i++)
+        {
+            SpawnApple();
+        }
+
+        //RpcLoseApple();
+
+        Invoke(nameof(ActiveCanGetHit), 2.5f);
+    }
+
+    [ClientRpc]
+    void RpcLoseApple()
+    {
+        int n = applecount-( (applecount) / 4);
+        
+
+        applecount = applecount / 4;
+        applecount = Mathf.Max(0, applecount - 1);
+
+        for (int i = 0; i < n; i++)
+        {
+            SpawnApple();
+        }
+    }
+
     void SpawnApple()
     {
-        // 1. Capsule Collider yarýçapýný al
-        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
-        float safeDistance = 1f; // minimum mesafe (ekstra güvenlik payý)
+        if (!isServer) return;
 
+        Debug.Log("spawn apple");
+
+        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+        float safeDistance = 1f;
         float colliderRadius = capsule != null ? capsule.radius : 0.5f;
         float spawnDistance = colliderRadius + safeDistance;
-        // 2. Rastgele yön belirle
+
         Vector3 randomDirection = new Vector3(
             Random.Range(-1f, 1f),
             0f,
             Random.Range(-1f, 1f)
         ).normalized;
 
-        // 3. Spawn pozisyonu = karakter pozisyonu + uzaklýk yönünde + biraz yukarý
         Vector3 spawnOffset = randomDirection * spawnDistance + Vector3.up * 0.5f;
         Vector3 spawnPos = transform.position + spawnOffset;
 
-        // 4. Elmayý oluþtur ve network’e bildir
         GameObject newApple = Instantiate(appleObj, spawnPos, Quaternion.identity);
         NetworkServer.Spawn(newApple);
 
-        
-
-        // 5. Kuvvet uygula (o yöne doðru ve yukarý)
         Rigidbody rb = newApple.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -122,42 +146,10 @@ public class AppleGameControl : NetworkBehaviour
         }
     }
 
-
-
-
-    [Command(requiresAuthority = false)]
-    void LoseApple()
-    {
-        canGetHit = false;
-
-
-        Debug.Log("we got hit" + this.gameObject.name);
-
-        Invoke("ActiveCanGetHit", 1.5f);
-
-        LoseAplleHelper();
-
-        //applecount--;
-
-    }
-
-    void LoseAplleHelper() 
-    {
-        int n = applecount / 2;
-
-        for (int i = 0; i < n; i++)
-        {
-            applecount--;
-            SpawnApple();
-        }
-
-        
-    }
-
-
-    void ActiveCanGetHit() 
+    void ActiveCanGetHit()
     {
         canGetHit = true;
+        GetComponent<PlayerMainController>().canMove = true;
     }
 
     void UpdateCooldownUI()
@@ -169,57 +161,29 @@ public class AppleGameControl : NetworkBehaviour
             return;
         }
 
-        float ratio =1-( weaponactivecurrent / weaponactivelimit);
+        float ratio = 1 - (weaponactivecurrent / weaponactivelimit);
         KurekImgFill.fillAmount = ratio;
-        KurekFillText.text = (weaponactivelimit-weaponactivecurrent).ToString("F1");
+        KurekFillText.text = (weaponactivelimit - weaponactivecurrent).ToString("F1");
     }
-
 
     public void OnTriggerEnter(Collider other)
     {
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
-        if (other.tag == "Apple")
+
+        if (other.CompareTag("Apple") && canGetHit && other.GetComponent<AppleObjController>().collectable)
         {
-            if (canGetHit) 
-            {
-                CmdDestroy(other.gameObject);
-
-                CollectApple();
-
-                Debug.Log("applle");
-            }
-            
-        }
-
-        
-    }
-
-
-    void ScaleUp()
-    {
-
-        ScaleLimit--;
-        if (ScaleLimit == 0)
-        {
-            ScaleLimit = 5;
-            Vector3 newScale = transform.localScale * 1.4f;
-            transform.localScale = newScale;
-            RpcScaleUp(newScale); // client’lara bildir
+            other.gameObject.tag = "Untagged";
+            CmdDestroy(other.gameObject);
+            CmdCollectApple();
         }
     }
 
-    [ClientRpc]
-    void RpcScaleUp(Vector3 newScale)
+    [Command(requiresAuthority = false)]
+    void CmdCollectApple()
     {
-        if (isServer) return; // Server zaten uyguladý
-        transform.localScale = newScale;
+        if(canGetHit)
+        applecount++;
     }
-
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
-    }
-
 
     [Command(requiresAuthority = false)]
     void CmdDestroy(GameObject obj)
@@ -227,14 +191,15 @@ public class AppleGameControl : NetworkBehaviour
         NetworkServer.Destroy(obj);
     }
 
-    [Command(requiresAuthority = false)]
-    void CollectApple() 
+    void OnAppleCountChanged(int oldCount, int newCount)
     {
-        applecount++;
-        ScaleUp();
+        int currentStep = newCount / applesPerScaleStep;
+
+        if (currentStep != previousStep)
+        {
+            float newScaleValue = 1f + (currentStep * scalePerStep);
+            transform.localScale = new Vector3(newScaleValue, newScaleValue, newScaleValue);
+            previousStep = currentStep;
+        }
     }
-
-   
-
-
 }

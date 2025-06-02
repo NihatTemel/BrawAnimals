@@ -48,13 +48,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2055189493712059247, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
       propertyPath: m_Name
       value: mushroom_L_shapekey
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
       propertyPath: m_TagString
       value: Apple
+      objectReference: {fileID: 0}
+    - target: {fileID: 1790183945725220954, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819001077394492298, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6826400441590642557, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[0]'
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6905609870639353253, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7036213049465896255, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -72,7 +100,23 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
       insertIndex: -1
       addedObject: {fileID: -383593153530605440}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6427899387692856427}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4008167780392470239}
   m_SourcePrefab: {fileID: 100100000, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+--- !u!137 &2182534442300439796 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6826400441590642557, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+  m_PrefabInstance: {fileID: 4680881078381775753}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5151957407004781666 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
+  m_PrefabInstance: {fileID: 4680881078381775753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5491222047378257624 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d81fa153508b03488eb70ad1b60b4c4, type: 3}
@@ -162,5 +206,57 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.523845, y: 1.8286592, z: 1.72}
+  m_Size: {x: 1.523845, y: 2.07, z: 1.72}
   m_Center: {x: 0.0584054, y: 0.9909094, z: 0}
+--- !u!114 &6427899387692856427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5491222047378257624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7e8ab5c077436f44aa405a518654360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  collectable: 0
+  appleSkin: {fileID: 2182534442300439796}
+  growDuration: 0.6
+--- !u!114 &4008167780392470239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5491222047378257624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 5151957407004781666}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  timelineOffset: 1
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChangeCorrectionMultiplier: 2
+  useFixedUpdate: 0
+  rotationSensitivity: 0.01
+  positionPrecision: 0.01
+  scalePrecision: 0.01

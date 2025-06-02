@@ -43,7 +43,7 @@ public class PlayerMainController : NetworkBehaviour
     public GameObject Weapon;
     public bool isattacking = false;
 
-    
+    [SyncVar] public bool canMove = true;
 
     private void Start()
     {
@@ -77,6 +77,12 @@ public class PlayerMainController : NetworkBehaviour
 
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
+        if (!canMove) 
+        {
+            horizontal = 0;
+            vertical = 0;
+        }
+        
 
         Vector3 cameraForward = CharacterCamera.transform.forward;
         Vector3 cameraRight = CharacterCamera.transform.right;
@@ -94,6 +100,7 @@ public class PlayerMainController : NetworkBehaviour
         float currentSpeed = canRun ? runSpeed : walkSpeed;
 
         // Hareket
+
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
         // Yöne dön
@@ -104,7 +111,7 @@ public class PlayerMainController : NetworkBehaviour
         }
 
         // Zýplama
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && isGrounded && canMove)
         {
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
             PlayAnimationByIndex(2); // Jump
@@ -157,6 +164,8 @@ public class PlayerMainController : NetworkBehaviour
         AttackActive();
         AttackPlayer();
     }
+
+    
 
     void AttackActive() 
     {
@@ -225,16 +234,8 @@ public class PlayerMainController : NetworkBehaviour
         if (Weapon != null)
             Weapon.SetActive(visible);
     }
-    /*[Command(requiresAuthority = false)]
-    void CmdSetPlayerName()
-    {
-        RpcSetPlayerName();
-    }
+    
 
-    [ClientRpc]
-    void RpcSetPlayerName()
-    {
-        nametext.text = playername;
-    }
-    */
+
+
 }
