@@ -64,7 +64,20 @@ public class PlayerMainController : NetworkBehaviour
         controller = GetComponent<CharacterController>();
 
         playername = transform.root.GetComponent<OnlinePrefabLobbyController>().playerName;
-        //CmdSetPlayerName();
+        CmdSetPlayerName();
+    }
+
+
+    [Command(requiresAuthority = false)]
+    void CmdSetPlayerName() 
+    {
+        RpcSetPlayerName();
+    }
+
+    [ClientRpc]
+    void RpcSetPlayerName() 
+    {
+        nametext.text = playername;
     }
 
     private void Update()

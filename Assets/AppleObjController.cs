@@ -1,45 +1,54 @@
 ﻿using UnityEngine;
 using Mirror;
 using System.Collections;
+
 public class AppleObjController : NetworkBehaviour
 {
+    [SyncVar(hook = nameof(OnCollectableChanged))]
     public bool collectable = false;
 
     public SkinnedMeshRenderer appleSkin;
     public float growDuration = 0.6f;
 
-    private bool started = false;
+    private bool animationStarted = false;
 
-    void Update()
+    void Start()
     {
-        if (!started && isServer) // sadece server başlatır, client'lara RPC ile aktarırız
+        if (isServer)
         {
-            started = true;
-            StartCoroutine(GrowEffectCoroutine());
-            Invoke(nameof(LateActive), growDuration);
+            StartCoroutine(AppleLifecycle());
         }
     }
 
-    void LateActive()
+    [Server]
+    IEnumerator AppleLifecycle()
     {
+        // Start grow animation on all clients
+        RpcPlayGrowEffect(growDuration);
+
+        // Wait for grow animation to complete
+        yield return new WaitForSeconds(growDuration);
+
+        // Make apple collectable
         collectable = true;
-        this.gameObject.layer = 0;
+        gameObject.layer = 0; // Default layer
     }
 
     [ClientRpc]
-    void RpcPlayGrowEffect(float totalDuration)
+    void RpcPlayGrowEffect(float duration)
     {
-        StartCoroutine(GrowEffectCoroutine(totalDuration));
+        if (!animationStarted)
+        {
+            animationStarted = true;
+            StartCoroutine(GrowEffectCoroutine(duration));
+        }
     }
-
-    IEnumerator GrowEffectCoroutine() => GrowEffectCoroutine(growDuration);
 
     IEnumerator GrowEffectCoroutine(float totalDuration)
     {
         float elapsed = 0f;
-
-        float firstPhase = totalDuration * 0.6f; // 60% of time to go from 100 to 0
-        float secondPhase = totalDuration * 0.4f; // 40% to go from 0 to 10
+        float firstPhase = totalDuration * 0.6f;
+        float secondPhase = totalDuration * 0.4f;
 
         // Phase 1: 100 → 0
         while (elapsed < firstPhase)
@@ -51,9 +60,7 @@ public class AppleObjController : NetworkBehaviour
             yield return null;
         }
 
-        // Snap to exact 0
         appleSkin.SetBlendShapeWeight(0, 0f);
-
         elapsed = 0f;
 
         // Phase 2: 0 → 10
@@ -66,15 +73,22 @@ public class AppleObjController : NetworkBehaviour
             yield return null;
         }
 
-        // Snap to exact 10
         appleSkin.SetBlendShapeWeight(0, 10f);
     }
 
-    public override void OnStartServer()
+    void OnCollectableChanged(bool oldValue, bool newValue)
     {
-        base.OnStartServer();
-
-        // Start animation on all clients
-        RpcPlayGrowEffect(growDuration);
+        // This will be called on all clients when collectable changes
+        collectable = newValue;
+        gameObject.layer = newValue ? 0 : LayerMask.NameToLayer("Ignore Raycast");
     }
+
+    /* Optional: If you need to handle collision/trigger differently
+    public void OnTriggerEnter(Collider other)
+    {
+        if (!collectable) return;
+        
+        // Handle collection logic here
+    }
+    */
 }

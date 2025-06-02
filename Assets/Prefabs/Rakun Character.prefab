@@ -568,6 +568,7 @@ MonoBehaviour:
   weaponactivecurrent: 0
   Weapon: {fileID: 0}
   isattacking: 0
+  canMove: 1
 --- !u!143 &7028893602081611834
 CharacterController:
   m_ObjectHideFlags: 0
@@ -839,6 +840,10 @@ PrefabInstance:
       propertyPath: _assetId
       value: 1237140230
       objectReference: {fileID: 0}
+    - target: {fileID: 5049259440235544370, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -870,6 +875,18 @@ PrefabInstance:
     - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
       propertyPath: m_SizeDelta.y
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.15024085
+      objectReference: {fileID: 0}
+    - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.15024085
+      objectReference: {fileID: 0}
+    - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.15024085
       objectReference: {fileID: 0}
     - target: {fileID: 5199963223267943800, guid: 14b3e0916acaf7a468591c134f7e55d7, type: 3}
       propertyPath: m_LocalPosition.x

@@ -12,7 +12,7 @@ public class AppleGameSceneSpawner : NetworkBehaviour
 
     void Update()
     {
-       
+        if (!isServer) return; // Sadece sunucu spawn iþlemi yapacak
 
         timer += Time.deltaTime;
         if (timer >= spawnInterval)
@@ -46,5 +46,25 @@ public class AppleGameSceneSpawner : NetworkBehaviour
 
         GameObject spawnedApple = Instantiate(appleobj, spawnPosition, Quaternion.identity);
         NetworkServer.Spawn(spawnedApple); // Network üzerinden spawnla
+
+        // Tüm client'lara spawn pozisyonunu bildir
+        RpcSpawnApple(spawnedApple, spawnPosition);
+    }
+
+    [ClientRpc]
+    void RpcSpawnApple(GameObject apple, Vector3 position)
+    {
+        if (!isServer) // Sunucu zaten spawnladý, sadece client'lar için
+        {
+            if (apple == null) return;
+
+            apple.transform.position = position;
+
+            // Eðer client'ta henüz bu obje yoksa, bir kopyasýný oluþtur
+            if (apple.GetComponent<NetworkIdentity>() == null || !apple.GetComponent<NetworkIdentity>().isClient)
+            {
+                Instantiate(appleobj, position, Quaternion.identity);
+            }
+        }
     }
 }
