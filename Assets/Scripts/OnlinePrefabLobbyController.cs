@@ -18,18 +18,18 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
     public string playerName;
 
     public string localName;
-
+    [SyncVar] public int index;
     void Update()
     {
         if (isLocalPlayer)
         {
             _islocal = true;
 
-            int index = PlayerPrefs.GetInt("selectedCharacter");
+            
 
-            if (Input.GetKeyDown(KeyCode.T))
-                CmdSpawnSelectedCharacter(index);
-
+            /*if (Input.GetKeyDown(KeyCode.T))
+                CmdSpawnSelectedCharacter();
+            */
             if (Input.GetKeyDown(KeyCode.R))
                 CmdSetReady(true);
         }
@@ -48,6 +48,7 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
             string steamName = SteamFriends.GetPersonaName();
             localName = steamName;
             CmdSetPlayerName(steamName);
+            index = PlayerPrefs.GetInt("selectedCharacter");
         }
     }
 
@@ -55,6 +56,7 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
     void CmdSetPlayerName(string name)
     {
         playerName = name;
+        index = PlayerPrefs.GetInt("selectedCharacter");
     }
 
     void OnNameChanged(string oldName, string newName)
@@ -69,17 +71,26 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
         Debug.Log($"[Server] Oyuncu {netId} ready durumu: {readyState}");
     }
 
-    [Command]
-    void CmdSpawnSelectedCharacter(int index)
+    [Command(requiresAuthority = false)]
+    public void CmdSpawnSelectedCharacter(int index)
     {
-        if (!isServer) return;
+        // Eðer bu connection için zaten bir karakter varsa spawnlama
+        if (currentCharacterIdentity != null && currentCharacterIdentity.connectionToClient == connectionToClient)
+        {
+            Debug.LogWarning("Character already spawned for this connection!");
+            return;
+        }
+        
 
-        //int index = PlayerPrefs.GetInt("selectedCharacter");
+        Debug.Log("Spawning character for connection: " + connectionToClient.connectionId);
+
+        
         GameObject character = Instantiate(characterList[index], transform.position, transform.rotation);
 
         NetworkServer.Spawn(character, connectionToClient);
-
         currentCharacterIdentity = character.GetComponent<NetworkIdentity>();
+
+        Debug.Log("Character spawned successfully for: " + connectionToClient.identity.netId);
         RpcParentCharacter(currentCharacterIdentity);
     }
 
@@ -118,7 +129,12 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
             }
         }
     }
-
+    [Command(requiresAuthority = false)]
+    public void CharacterSpawnHelper() 
+    {
+        Debug.Log("spawn test 1-1");
+       // CmdSpawnSelectedCharacter();
+    }
     public override void OnStopClient()
     {
         base.OnStopClient();

@@ -6,7 +6,7 @@ public class AppleObjController : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnCollectableChanged))]
     public bool collectable = false;
-
+    public BoxCollider HitBoxCollider;
     public SkinnedMeshRenderer appleSkin;
     public float growDuration = 0.6f;
 

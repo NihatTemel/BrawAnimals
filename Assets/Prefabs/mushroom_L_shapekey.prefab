@@ -224,6 +224,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   collectable: 0
+  HitBoxCollider: {fileID: -383593153530605440}
   appleSkin: {fileID: 2182534442300439796}
   growDuration: 0.6
 --- !u!114 &4008167780392470239

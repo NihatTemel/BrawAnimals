@@ -31,6 +31,7 @@ public class PlayerMainController : NetworkBehaviour
     public float staminaDrainRate = 0.2f; // saniyede drain
     public float staminaRecoverRate = 0.1f; // boþta geri kazaným hýzý
     public float staminaThreshold = 0.1f;
+    public GameObject SprintVfx;
 
     public TMP_Text nametext;
     [SyncVar] public string playername;
@@ -71,8 +72,10 @@ public class PlayerMainController : NetworkBehaviour
     [Command(requiresAuthority = false)]
     void CmdSetPlayerName() 
     {
+        nametext.text = playername;
         RpcSetPlayerName();
     }
+
 
     [ClientRpc]
     void RpcSetPlayerName() 
@@ -82,6 +85,12 @@ public class PlayerMainController : NetworkBehaviour
 
     private void Update()
     {
+        if (nametext != null) 
+        {
+            //nametext.transform.LookAt(CharacterCamera.transform);
+            CmdSetPlayerName();
+        }
+
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
 
         isGrounded = controller.isGrounded;
@@ -139,11 +148,14 @@ public class PlayerMainController : NetworkBehaviour
         {
             stamina -= staminaDrainRate * Time.deltaTime;
             stamina = Mathf.Clamp01(stamina);
+            CmdSetVfxVisible(true);
         }
         else if (!shiftPressed)
         {
             stamina += staminaRecoverRate * Time.deltaTime;
             stamina = Mathf.Clamp01(stamina);
+            CmdSetVfxVisible(false);
+
         }
 
         if (StaminaImg != null)
@@ -172,8 +184,11 @@ public class PlayerMainController : NetworkBehaviour
             }
         }
 
-        if (nametext != null)
+        if (nametext != null) 
+        {
             nametext.transform.LookAt(CharacterCamera.transform);
+            CmdSetPlayerName();
+        }
         AttackActive();
         AttackPlayer();
     }
@@ -247,8 +262,18 @@ public class PlayerMainController : NetworkBehaviour
         if (Weapon != null)
             Weapon.SetActive(visible);
     }
-    
 
 
+    [Command]
+    void CmdSetVfxVisible(bool visible)
+    {
+        RpcSetVfxVisible(visible);
+    }
+    [ClientRpc]
+    void RpcSetVfxVisible(bool visible)
+    {
+        if (SprintVfx != null)
+            SprintVfx.SetActive(visible);
+    }
 
 }

@@ -185,8 +185,8 @@ MonoBehaviour:
   target: {fileID: 0}
   offset: {x: 0, y: 2, z: -5}
   rotationSpeed: 5
-  minY: -35
-  maxY: 60
+  minY: -15
+  maxY: 50
 --- !u!1 &2408436089125993145
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 7105084449808006897}
   - component: {fileID: 6051698291002957307}
   - component: {fileID: 2739876970382595004}
+  - component: {fileID: 2094766496614248490}
   m_Layer: 0
   m_Name: OnlinePlayer
   m_TagString: Untagged
@@ -314,6 +315,10 @@ MonoBehaviour:
   - {fileID: 2463895629111587824, guid: 0d12493099f32fa4baeffa6a7f7cf101, type: 3}
   currentCharacterIdentity: {fileID: 0}
   currentCharacter: {fileID: 0}
+  isReady: 0
+  _islocal: 0
+  playerName: 
+  localName: 
 --- !u!114 &2739876970382595004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,3 +334,20 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+--- !u!114 &2094766496614248490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2408436089125993145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f6e3a41f057d82418014602a998a4d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  GameSceneNames:
+  - Demo with terrain

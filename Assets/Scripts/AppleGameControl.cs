@@ -2,12 +2,22 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 using TMPro;
-
+using DG.Tweening;
+using System.Collections;
 public class AppleGameControl : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnAppleCountChanged))] public int applecount = 1;
 
     public GameObject Kurek;
+
+
+
+    [SyncVar(hook = nameof(OnTrailStateChanged))]
+    private bool isTrailActive;
+    public GameObject trailObject; // Inspector'dan ata
+
+
+
     public bool weaponactive = false;
     public float weaponactivelimit = 5;
     public float weaponactivecurrent = 0;
@@ -27,13 +37,36 @@ public class AppleGameControl : NetworkBehaviour
 
     private int previousStep = 0;
 
+    public GameObject AppleGameCamera;
+
+    [Header("Vfx effects")]
+    public ParticleSystem LevelUp;
+    public ParticleSystem LevelDown;
+    public ParticleSystem BasicHit;
+
+
     void Start()
     {
         GetComponent<PlayerMainController>().Weapon = Kurek;
-
+        trailObject = Kurek.transform.GetChild(0).gameObject;
         CanvasGameScene = GameObject.Find("CanvasGameScene");
         KurekImgFill = CanvasGameScene.GetComponent<AppleGameCanvas>().KurekFillImg;
         KurekFillText = CanvasGameScene.GetComponent<AppleGameCanvas>().KurekFillText;
+
+        AppleGameCamera = transform.root.GetComponent<OnlinePrefabController>().TPSCamera;
+
+    }
+
+
+    void SetAllNames()
+    {
+        GameObject[] Players = GameObject.FindGameObjectsWithTag("PlayerCharacter");
+        int n = Players.Length;
+
+        for (int i = 0; i < n; i++)
+        {
+            Players[i].GetComponent<PlayerMainController>().nametext.text = Players[i].transform.root.GetComponent<OnlinePrefabLobbyController>().playerName;
+        }
     }
 
     void Update()
@@ -45,7 +78,7 @@ public class AppleGameControl : NetworkBehaviour
         weaponactivecurrent = GetComponent<PlayerMainController>().weaponactivecurrent;
         isattacking = GetComponent<PlayerMainController>().isattacking;
 
-        if (Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.N))
         {
             CmdCollectApple();
         }
@@ -56,22 +89,31 @@ public class AppleGameControl : NetworkBehaviour
 
         UpdateCooldownUI();
         AttackEnemy();
+        SetAllNames();
     }
 
     void AttackEnemy()
     {
-        if (!isattacking) return;
+        if (!canGetHit) return;
 
+        if (!isattacking) 
+        {
+            CmdSetTrailState(false);
+            return;
+
+        }
+
+        CmdSetTrailState(true);
         if (Kurek.GetComponent<KurekTrigger>().enemy != null)
         {
             GameObject enemy = Kurek.GetComponent<KurekTrigger>().enemy;
             if (enemy == this.gameObject) return;
-
+            if (!canGetHit) return;
             var control = enemy.GetComponent<AppleGameControl>();
             if (control.canGetHit)
             {
                 enemy.GetComponent<PlayerMainController>().canMove = false;
-
+                enemy.GetComponent<AppleGameControl>().CmdHitEffect();
                 control.canGetHit = false;
                 control.CmdLoseApple();
                 Debug.Log("hit player " + enemy.gameObject.name);
@@ -83,6 +125,7 @@ public class AppleGameControl : NetworkBehaviour
     public void CmdLoseApple()
     {
         canGetHit = false;
+        
         GetComponent<PlayerMainController>().canMove = false;
         int n = applecount - ((applecount) / 4);
 
@@ -173,7 +216,8 @@ public class AppleGameControl : NetworkBehaviour
         if (other.CompareTag("Apple") && canGetHit && other.GetComponent<AppleObjController>().collectable)
         {
             other.gameObject.tag = "Untagged";
-            CmdDestroy(other.gameObject);
+            //CmdDestroy(other.gameObject);
+            AppleMoveCharacter(other.gameObject);
             CmdCollectApple();
         }
     }
@@ -191,6 +235,31 @@ public class AppleGameControl : NetworkBehaviour
         NetworkServer.Destroy(obj);
     }
 
+
+
+    [Command(requiresAuthority =false)]
+    void AppleMoveCharacter(GameObject apple) 
+    {
+        RpcAppleMoveCharacter(apple);        
+    }
+
+    [ClientRpc]
+    void RpcAppleMoveCharacter(GameObject apple) 
+    {
+        apple.GetComponent<AppleObjController>().HitBoxCollider.enabled = false;
+        apple.transform.DOMove(this.transform.position, 0.3f);
+        apple.transform.DOScale(Vector3.zero, 0.3f);
+        StartCoroutine(Destroylate(apple));
+        
+    }
+
+    IEnumerator Destroylate(GameObject apple) 
+    {
+        yield return new WaitForSeconds(0.35f);
+        CmdDestroy(apple);
+    }
+
+
     void OnAppleCountChanged(int oldCount, int newCount)
     {
         int currentStep = newCount / applesPerScaleStep;
@@ -198,8 +267,63 @@ public class AppleGameControl : NetworkBehaviour
         if (currentStep != previousStep)
         {
             float newScaleValue = 1f + (currentStep * scalePerStep);
-            transform.localScale = new Vector3(newScaleValue, newScaleValue, newScaleValue);
+            Vector3 targetScale = new Vector3(newScaleValue, newScaleValue, newScaleValue);
+
+            // Karakteri yumuþak þekilde büyüt
+            transform.DOScale(targetScale, 0.5f).SetEase(Ease.OutBack);
+
+            if(targetScale.y > transform.localScale.y) 
+            {
+                LevelUp.Play();
+            }
+            else 
+            {
+                LevelDown.Play();
+            }
+
+
+            // Kamera offset ayarý
+            TPSCameraFollow cameraFollow = AppleGameCamera.GetComponent<TPSCameraFollow>();
+            if (cameraFollow != null)
+            {
+                Vector3 baseOffset = new Vector3(0, 2f, -5f);
+
+                // Daha dengeli bir uzaklaþma (daha az geri çekilme)
+                Vector3 targetOffset = baseOffset + new Vector3(0, 1.2f, -1.4f) * (newScaleValue - 1f);
+
+
+                // DOTween ile offset animasyonu
+                DOTween.To(() => cameraFollow.offset, x => cameraFollow.offset = x, targetOffset, 0.5f)
+                       .SetEase(Ease.OutSine);
+            }
+
             previousStep = currentStep;
         }
     }
+
+    private void OnTrailStateChanged(bool oldValue, bool newValue)
+    {
+        trailObject.SetActive(newValue);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSetTrailState(bool active)
+    {
+        isTrailActive = active;
+    }
+
+
+    [Command(requiresAuthority = false)]
+    public void CmdHitEffect() 
+    {
+        RpcHitEffect();
+    }
+
+
+    [ClientRpc]
+    void RpcHitEffect()
+    {
+        BasicHit.Play();
+    }
+
 }
