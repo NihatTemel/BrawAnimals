@@ -299,6 +299,15 @@ public class AppleGameControl : NetworkBehaviour
 
             previousStep = currentStep;
         }
+
+        if (transform.root.GetComponent<OnlinePrefabLobbyController>().isLocalPlayer) 
+        {
+            this.gameObject.transform.root.GetComponent<OnlinePlayerGameSceneVariables>().LastSceneScore = applecount;
+            PlayerPrefs.SetInt("LastSceneScore", newCount);
+
+        }
+
+
     }
 
     private void OnTrailStateChanged(bool oldValue, bool newValue)

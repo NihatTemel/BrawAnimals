@@ -42,14 +42,14 @@ public class AppleGameCanvas : NetworkBehaviour
     }
 
 
-   
+
 
 
     void RefreshPlayers()
     {
         Players = FindObjectsByType<OnlinePrefabLobbyController>(FindObjectsSortMode.None);
         Players2 = FindObjectsByType<AppleGameControl>(FindObjectsSortMode.None);
-       
+
         if (Players == null || Players.Length == 0)
         {
             Debug.Log("Hiç oyuncu bulunamadý.");
@@ -63,7 +63,16 @@ public class AppleGameCanvas : NetworkBehaviour
             StartCountdown();
         }
 
-        Players = Players.OrderBy(p => p.netId).ToArray();
+        // Oyuncularý skorlarýna göre azalan sýrada sýrala
+        Players = Players.OrderByDescending(p =>
+        {
+            if (p.currentCharacterIdentity != null &&
+                p.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>() != null)
+            {
+                return p.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>().applecount;
+            }
+            return 0; // Skor bilgisi yoksa 0 kabul et
+        }).ToArray();
 
         // Tüm Player panel objelerini kapat
         for (int i = 0; i < PlayerListRoot.transform.childCount; i++)
@@ -84,9 +93,23 @@ public class AppleGameCanvas : NetworkBehaviour
                 nameText.text = player.playerName;
 
             TMP_Text ScoreText = panel.transform.GetChild(0).GetComponentInChildren<TMP_Text>();
-            if (player.currentCharacterIdentity != null && player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>() != null)
+            if (player.currentCharacterIdentity != null &&
+                player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>() != null)
             {
-                ScoreText.text = "" + player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>().applecount;
+                int score = player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>().applecount;
+                ScoreText.text = score.ToString();
+
+                // Ýsteðe baðlý: Skor rengini vurgulamak için
+                if (i == 0) // En yüksek skor
+                {
+                    ScoreText.color = Color.yellow; // Veya baþka bir vurgu rengi
+                    nameText.color = Color.yellow;
+                }
+                else
+                {
+                    ScoreText.color = Color.white;
+                    nameText.color = Color.white;
+                }
             }
         }
     }
@@ -188,7 +211,9 @@ public class AppleGameCanvas : NetworkBehaviour
     {
         Debug.Log("Oyun bitti!");
 
-        NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-        // Oyun bitiþ iþlemleri buraya gelecek
+
+
+        NetworkManager.singleton.ServerChangeScene("EndGameScene");
+        
     }
 }

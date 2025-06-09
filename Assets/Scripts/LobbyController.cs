@@ -11,6 +11,7 @@ public class LobbyController : MonoBehaviour
 
     public GameObject StartGameButton;
 
+
     void Start()
     {
         InvokeRepeating(nameof(RefreshPlayers), 0f, 0.5f); // Her 2 saniyede bir kontrol
@@ -72,7 +73,9 @@ public class LobbyController : MonoBehaviour
             if (readyImage != null)
                 readyImage.color = player.isReady ? Color.green : Color.red;
 
-            StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartGameClicked);  // koþul aktif edildiðinde silinecek satýr
+
+            if(StartGameButton.activeInHierarchy)
+                StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartGameClicked);  // koþul aktif edildiðinde silinecek satýr
             /*if (Players.Length > 1) 
             {
                 bool allready = true;
@@ -96,7 +99,7 @@ public class LobbyController : MonoBehaviour
     }
 
 
-    void OnStartGameClicked()
+    public void OnStartGameClicked()
     {
         if (!NetworkServer.active)
         {
@@ -106,7 +109,34 @@ public class LobbyController : MonoBehaviour
 
         Debug.Log("Oyun baþlatýlýyor...");
         // Sahne deðiþikliði (host tarafýndan)
+       
         NetworkManager.singleton.ServerChangeScene("Demo with terrain");
+    }
+
+    public void OnStartNextGameClicked() 
+    {
+        if (!NetworkServer.active)
+        {
+            Debug.LogWarning("Sadece host iþlem yapabilir!");
+            return;
+        }
+
+        int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
+
+        sceneIndex = 1;
+
+        // Build Settings'teki sahnelerin index aralýðýný kontrol et
+        if (sceneIndex >= 0 && sceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+
+            NetworkManager.singleton.ServerChangeScene(sceneName);
+        }
+        else
+        {
+            Debug.LogError($"Geçersiz sahne indexi: {sceneIndex}");
+        }
     }
 
 }

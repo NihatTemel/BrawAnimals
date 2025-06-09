@@ -36,6 +36,7 @@ public class OnlinePlayerCharacterSpawner : NetworkBehaviour
             // Sadece local player için spawn iþlemi
             if (isLocalPlayer)
             {
+                PlayerPrefs.SetInt("LastSceneScore", 0);
                 int index = PlayerPrefs.GetInt("selectedCharacter");
                 GetComponent<OnlinePrefabLobbyController>().CmdSpawnSelectedCharacter(index);
                 hasSpawned = true; // Spawnlandý olarak iþaretle
