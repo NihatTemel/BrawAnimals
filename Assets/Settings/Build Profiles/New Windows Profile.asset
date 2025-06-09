@@ -23,7 +23,7 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/MainMenu.unity
   - m_enabled: 1
-    m_path: Assets/Scenes/Demo with terrain.unity
+    m_path: Assets/Scenes/AppleGameScenePrefrabs/Apple Scene Back up.unity
   - m_enabled: 1
     m_path: Assets/Scenes/Lobby Menu.unity
   m_ScriptingDefines: []
