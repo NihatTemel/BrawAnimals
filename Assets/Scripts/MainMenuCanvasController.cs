@@ -11,6 +11,14 @@ public class MainMenuCanvasController : MonoBehaviour
     void Start()
     {
         CharacterNameDesign();
+        PlayerStatsSettings();
+    }
+
+
+    void PlayerStatsSettings() 
+    {
+        PlayerPrefs.SetInt("GameScore", 0);
+        PlayerPrefs.SetInt("LastSceneLeadership", 0);
     }
 
     public void ChracterSelectPanelOn() 

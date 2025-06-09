@@ -352,7 +352,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   GameSceneNames:
-  - Demo with terrain
+  - Apple Game
 --- !u!114 &4976344766701448510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,3 +370,5 @@ MonoBehaviour:
   syncInterval: 0
   LastSceneScore: 0
   LastSceneLeadership: 0
+  GameScore: 0
+  ScoreUpdate: 0

@@ -4,6 +4,7 @@ using TMPro;
 using Mirror;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using System.Collections.Generic;
 public class EndGameLobbyController : MonoBehaviour
 {
     public GameObject PlayerListRoot;
@@ -14,7 +15,9 @@ public class EndGameLobbyController : MonoBehaviour
     public GameObject StartGameButton;
 
     public int TotalScore;
+    public List<int> scores = new List<int>();
 
+    public bool ReadyToListLeaders=false;
     void Start()
     {
         InvokeRepeating(nameof(RefreshPlayers), 0f, 0.5f); // Her 2 saniyede bir kontrol
@@ -22,45 +25,57 @@ public class EndGameLobbyController : MonoBehaviour
     }
 
 
-    void LoadTotalScore() 
+    void LoadTotalScore()
     {
         Players = FindObjectsByType<OnlinePrefabLobbyController>(FindObjectsSortMode.None);
         PlayerVariables = FindObjectsByType<OnlinePlayerGameSceneVariables>(FindObjectsSortMode.None);
 
         Debug.Log("load score test 1");
 
-        // Oyuncu kontrolü
         if (Players == null || Players.Length == 0)
-        {            
+        {
             Invoke("LoadTotalScore", 0.5f);
             Debug.Log("load score test 2");
-
             return;
         }
+
         Debug.Log("load score test 3");
 
-        int n = Players.Length;
+        int n = PlayerVariables.Length;
+        
+
         for (int i = 0; i < n; i++)
         {
-            Debug.Log("load score test 4");
-
-
-            string ListName = PlayerListRoot.transform.GetChild(i).GetComponent<TMP_Text>().text;
-
-            for (int s = 0; s < n; s++)
-            {
-                Debug.Log("load score test 5" + Players[s].isLocalPlayer );
-
-                if (Players[s].isLocalPlayer  && Players[s].playerName==ListName) 
-                {
-                    Debug.Log("load score test 6" );
-
-                    Debug.Log("Score rank -> " + s);
-                }
-            }
-            
+            scores.Add(PlayerVariables[i].LastSceneScore);
+            Debug.Log("Player score " + PlayerVariables[i].LastSceneScore);
         }
 
+        // Skorlarý azalan þekilde sýrala
+        List<int> sortedScores = scores.OrderByDescending(s => s).ToList();
+
+        for (int i = 0; i < n; i++)
+        {
+            if (PlayerVariables[i].GetComponent<OnlinePrefabLobbyController>().isLocalPlayer)
+            {
+                int myScore = PlayerVariables[i].LastSceneScore;
+                int myRank = sortedScores.IndexOf(myScore); // ayný skor varsa ilk bulduðunu alýr
+
+                Debug.Log("Benim sýram: " + (myRank + 1));
+
+                int extraScore = Mathf.Clamp(10 - myRank, 3, 10);
+
+                PlayerPrefs.SetInt("GameScore", PlayerPrefs.GetInt("GameScore") + extraScore);
+
+                Debug.Log("Game Score -> " + PlayerPrefs.GetInt("GameScore"));
+
+                Debug.Log("Ekstra puaným: " + extraScore);
+
+                PlayerVariables[i].GameScore = PlayerPrefs.GetInt("GameScore");
+                PlayerVariables[i].ScoreUpdate = true;
+                break;
+            }
+        }
+        
     }
 
 
@@ -142,7 +157,60 @@ public class EndGameLobbyController : MonoBehaviour
             StartGameButton.GetComponent<Button>().onClick.RemoveAllListeners();
             StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartNextGameClicked);
         }
+
+        int nn = 0;
+        foreach (var item in PlayerVariables)
+        {
+            if (item.ScoreUpdate == false)
+                nn = 1;
+        }
+        if (nn == 0)
+            ReadyToListLeaders = true;
+
+        LeadersListUpdate();
+
     }
+
+
+    void LeadersListUpdate()
+    {
+        if (!ReadyToListLeaders)
+            return;
+
+        PlayerVariables = FindObjectsByType<OnlinePlayerGameSceneVariables>(FindObjectsSortMode.None);
+
+        List<(string name, int score)> leaderboard = new List<(string name, int score)>();
+
+        foreach (var item in PlayerVariables)
+        {
+            string playerName = item.GetComponent<OnlinePrefabLobbyController>().playerName;
+            int score = item.GameScore;
+            leaderboard.Add((playerName, score));
+        }
+
+        // Skora göre azalan sýrala
+        leaderboard = leaderboard.OrderByDescending(p => p.score).ToList();
+
+
+        Debug.Log("List childcount -> " + PlayerHighScoreRoot.transform.childCount);
+
+        for (int i = 0; i < leaderboard.Count && i < PlayerHighScoreRoot.transform.childCount; i++)
+        {
+            PlayerHighScoreRoot.transform.GetChild(i).gameObject.SetActive(true);
+            Transform playerEntry = PlayerHighScoreRoot.transform.GetChild(i);
+
+            // 1. sýradaki için: "1. Murat"
+            string nameText = $"{i + 1}. {leaderboard[i].name}";
+            string scoreText = leaderboard[i].score.ToString();
+
+            // Ýsim ve sýra
+            playerEntry.GetComponent<TMP_Text>().text = nameText;
+
+            // Skor
+            playerEntry.GetChild(0).GetComponent<TMP_Text>().text = scoreText;
+        }
+    }
+
 
 
     public void OnStartGameClicked()

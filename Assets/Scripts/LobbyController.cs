@@ -11,10 +11,25 @@ public class LobbyController : MonoBehaviour
 
     public GameObject StartGameButton;
 
+    public GameObject SceneSelectButtonsRoot;
 
     void Start()
     {
+        CheckAndClearSceneList();
         InvokeRepeating(nameof(RefreshPlayers), 0f, 0.5f); // Her 2 saniyede bir kontrol
+    }
+
+
+    void CheckAndClearSceneList()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        if (currentScene == "Lobby Menu")
+        {
+            PlayerPrefs.DeleteKey("SceneList");
+            PlayerPrefs.Save();
+            Debug.Log("Lobby Menu sahnesindeyiz. SceneList temizlendi.");
+        }
     }
 
     void RefreshPlayers()
@@ -99,18 +114,97 @@ public class LobbyController : MonoBehaviour
     }
 
 
+    public void AddListToScneList2()
+    {
+        //Debug.Log("-> scene name " + test.name);
+    }
+
+
+    public void AddListToSceneList(int sceneIndex)
+    {
+        string currentList = PlayerPrefs.GetString("SceneList", "");
+        string indexStr = sceneIndex.ToString();
+
+        if (currentList.Contains(indexStr))
+        {
+            SceneSelectButtonsRoot.transform.GetChild(sceneIndex - 3).GetChild(1).gameObject.SetActive(false);
+            // Çýkar: Tüm eþleþmeleri temizle
+            currentList = currentList.Replace(indexStr, "");
+            Debug.Log("Çýkarýldý: " + indexStr);
+        }
+        else
+        {
+            SceneSelectButtonsRoot.transform.GetChild(sceneIndex - 3).GetChild(1).gameObject.SetActive(true);
+
+
+            currentList += indexStr;
+            Debug.Log("Eklendi: " + indexStr);
+        }
+
+        PlayerPrefs.SetString("SceneList", currentList);
+        PlayerPrefs.Save();
+
+        Debug.Log("Güncel liste: " + currentList);
+    }
+
+
+    public int FindNextScene()
+    {
+        string currentList = PlayerPrefs.GetString("SceneList", "");
+
+        if (string.IsNullOrEmpty(currentList))
+        {
+            Debug.LogWarning("SceneList boþ!");
+            return -1; // Liste boþsa -1 döner
+        }
+
+        // Ýlk karakteri al
+        char nextChar = currentList[0];
+
+        // Integer'a çevir
+        if (int.TryParse(nextChar.ToString(), out int nextScene))
+        {
+            // Kalan listeyi al ve kaydet
+            string updatedList = currentList.Substring(1);
+            PlayerPrefs.SetString("SceneList", updatedList);
+            PlayerPrefs.Save();
+
+            Debug.Log("Sonraki sahne: " + nextScene + " | Güncel Liste: " + updatedList);
+            return nextScene;
+        }
+        else
+        {
+            Debug.LogError("SceneList'teki karakter sayý deðil: " + nextChar);
+            return -1;
+        }
+    }
+
+
+
     public void OnStartGameClicked()
     {
         if (!NetworkServer.active)
         {
-            Debug.LogWarning("Sadece host oyunu baþlatabilir!");
+            Debug.LogWarning("Sadece host iþlem yapabilir!");
             return;
         }
 
-        Debug.Log("Oyun baþlatýlýyor...");
-        // Sahne deðiþikliði (host tarafýndan)
-       
-        NetworkManager.singleton.ServerChangeScene("Demo with terrain");
+        int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
+
+        sceneIndex = FindNextScene();
+
+        // Build Settings'teki sahnelerin index aralýðýný kontrol et
+        if (sceneIndex >= 0 && sceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+
+            NetworkManager.singleton.ServerChangeScene(sceneName);
+        }
+        else
+        {
+            Debug.LogError($"Geçersiz sahne indexi: {sceneIndex}");
+        }
     }
 
     public void OnStartNextGameClicked() 
@@ -123,7 +217,7 @@ public class LobbyController : MonoBehaviour
 
         int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
 
-        sceneIndex = 1;
+        sceneIndex = FindNextScene();
 
         // Build Settings'teki sahnelerin index aralýðýný kontrol et
         if (sceneIndex >= 0 && sceneIndex < SceneManager.sceneCountInBuildSettings)

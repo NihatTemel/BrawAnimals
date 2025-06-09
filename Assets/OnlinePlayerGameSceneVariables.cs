@@ -9,6 +9,10 @@ public class OnlinePlayerGameSceneVariables : NetworkBehaviour
     [SyncVar(hook = nameof(OnLastSceneLeadershipChanged))]
     public int LastSceneLeadership;
 
+    [SyncVar(hook = nameof(OnLastSceneLeadershipChanged))] 
+    public int GameScore;
+
+    [SyncVar] public bool ScoreUpdate = false;
     private void Start()
     {
         if (isLocalPlayer)
@@ -16,7 +20,27 @@ public class OnlinePlayerGameSceneVariables : NetworkBehaviour
             // Yalnýzca lokal oyuncu için PlayerPrefs'ten yükle
             LoadPlayerPrefs();
             Debug.Log("LAST SCENE SCORE " + PlayerPrefs.GetInt("LastSceneScore"));
+            Invoke("CallGameScore", 1);
         }
+    }
+
+    void CallGameScore() 
+    {
+        int n = GameScore;
+        CmdGameScore(n);
+    }
+
+    [Command(requiresAuthority=false)]
+    void CmdGameScore(int n) 
+    {
+        RpcGameScore(n);
+    }
+
+    [ClientRpc]
+    void RpcGameScore(int n) 
+    {
+        GameScore = n;
+        ScoreUpdate = true;
     }
 
     
@@ -30,6 +54,19 @@ public class OnlinePlayerGameSceneVariables : NetworkBehaviour
 
         }
     }
+
+    private void OnLastGameScoreChanged(int oldValue, int newValue)
+    {
+
+        GameScore = newValue;
+        if (isLocalPlayer)
+        {
+            Debug.Log("changed score " + newValue);
+            PlayerPrefs.SetInt("GameScore", newValue);
+
+        }
+    }
+
 
     private void OnLastSceneScoreChanged(int oldValue, int newValue)
     {
@@ -82,6 +119,7 @@ public class OnlinePlayerGameSceneVariables : NetworkBehaviour
     private void CmdUpdateLeadership(int newLeadership)
     {
         LastSceneLeadership = newLeadership;
+        
     }
 
     // Oyun sonunda çaðrýlacak metod
