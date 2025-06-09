@@ -237,7 +237,7 @@ public class EndGameLobbyController : MonoBehaviour
 
         int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
 
-        sceneIndex = 1;
+        sceneIndex = 3;
 
         foreach (var item in PlayerVariables)
         {
