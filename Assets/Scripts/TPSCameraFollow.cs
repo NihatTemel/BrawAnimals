@@ -1,11 +1,10 @@
 using UnityEngine;
-using DG.Tweening;
+
 public class TPSCameraFollow : MonoBehaviour
 {
-    public Transform target;           // Karakterin transformu
-    public Vector3 offset = new Vector3(0, 2, -5); // Kamera mesafesi
+    public Transform target;
+    public Vector3 offset = new Vector3(0, 2, -5);
     public float rotationSpeed = 5f;
-
     public float minY = -35f;
     public float maxY = 60f;
 
@@ -14,40 +13,48 @@ public class TPSCameraFollow : MonoBehaviour
 
     public bool aiming = false;
 
-    public GameObject AimingPositiion;
+    public GameObject AimingPosition;
+    public Vector3 AimoffSet = new Vector3(1, 1, -1);
+    public float AimingRight = 1;
+    public float AimingUp;
+
+    private Transform aimCamTarget;
+
+    void Start()
+    {
+        var character = transform.root.GetComponent<OnlinePrefabLobbyController>().currentCharacter;
+        if (character != null)
+        {
+            target = character.transform;
+            aimCamTarget = character.GetComponent<BowGameControl>().AimCamPosition.transform;
+        }
+    }
 
     void LateUpdate()
     {
-        
-
-
-        SettingOffset();
-        SetAimming();
-    }
-
-
-    void SetAimming() 
-    {
-        if (!aiming)
-            return;
-        transform.position = AimingPositiion.transform.position;
-        transform.rotation = AimingPositiion.transform.rotation;
-
-        transform.LookAt(target); // Hafif yukarý bakar
-
-    }
-
-
-    void SettingOffset() 
-    {
         if (aiming)
-            return;
+            SetAimingView();
+        else
+            SetThirdPersonView();
+    }
 
-        target = transform.root.GetComponent<OnlinePrefabLobbyController>().currentCharacter.transform;
-
+    void SetAimingView()
+    {
         if (target == null) return;
 
-        // Fare giriþi
+        float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
+        currentPitch -= mouseY;
+        currentPitch = Mathf.Clamp(currentPitch, minY, maxY);
+
+        // Kamera karakterin pozisyonuna göre ayarlanýr, sadece yukarý-aþaðý bakar
+        transform.position = target.position + target.TransformDirection(AimoffSet);
+        transform.rotation = Quaternion.Euler(currentPitch, target.eulerAngles.y, 0f);
+    }
+
+    void SetThirdPersonView()
+    {
+        if (target == null) return;
+
         float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
         float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
 
@@ -55,13 +62,12 @@ public class TPSCameraFollow : MonoBehaviour
         currentPitch -= mouseY;
         currentPitch = Mathf.Clamp(currentPitch, minY, maxY);
 
-        // Kamerayý döndür
-        Quaternion rotation = Quaternion.Euler(currentPitch, currentYaw, 0);
+        Quaternion rotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
         Vector3 desiredPosition = target.position + rotation * offset;
 
         transform.position = desiredPosition;
-        transform.LookAt(target.position + Vector3.up * 1.5f); // Hafif yukarý bakar
+        transform.LookAt(target.position + Vector3.up * 1.5f);
     }
 
-
+    public bool Aiming => aiming;
 }

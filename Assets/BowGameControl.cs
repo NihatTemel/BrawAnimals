@@ -44,6 +44,7 @@ public class BowGameControl : NetworkBehaviour
     public ParticleSystem LevelDown;
     public ParticleSystem BasicHit;
 
+    public GameObject AimCamPosition;
 
     void Start()
     {
@@ -98,6 +99,7 @@ public class BowGameControl : NetworkBehaviour
         if (Input.GetMouseButtonUp(0))
             AttackEnemy();
 
+        
        
 
         SetAllNames();
@@ -106,6 +108,15 @@ public class BowGameControl : NetworkBehaviour
 
     void SettingAim() 
     {
+        if (!canGetHit) return;
+
+        if (!isattacking)
+        {
+            //CmdSetTrailState(false);
+            return;
+
+        }
+
         //GameObject TpsCamera = GetComponent<OnlinePrefabController>().TPSCamera;
         TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
 
@@ -115,6 +126,9 @@ public class BowGameControl : NetworkBehaviour
 
     void AttackEnemy()
     {
+        TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
+
+        TpsFollow.aiming = false;
         if (!canGetHit) return;
 
         if (!isattacking)

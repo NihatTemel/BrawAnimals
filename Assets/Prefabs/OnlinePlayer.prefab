@@ -190,6 +190,9 @@ MonoBehaviour:
   maxY: 50
   aiming: 0
   AimingPositiion: {fileID: 8394599643782718272}
+  AimoffSet: {x: 1, y: 1, z: -1}
+  AimingRight: 1
+  AimingUp: 0
 --- !u!1 &2408436089125993145
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,10 +405,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8394599643782718272}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.03116559, y: -0.23881519, z: 0.0076687834, w: 0.9705345}
-  m_LocalPosition: {x: -3.419, y: -2.807, z: -17.515}
+  m_LocalRotation: {x: 0.00047008475, y: 0.9990116, z: -0.04309244, w: 0.010897971}
+  m_LocalPosition: {x: -14.540001, y: -2.8, z: -7.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8008548806507587619}
-  m_LocalEulerAnglesHint: {x: 3.678, y: -27.648, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3138988724986903123
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4327707569414380964}
+  m_Layer: 6
+  m_Name: BowCamPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4327707569414380964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3138988724986903123}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.045325067, y: 0.10608682, z: 0.00078418374, w: -0.993323}
+  m_LocalPosition: {x: 1.182, y: 1.46, z: -1.767}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2988794390264490314}
+  m_LocalEulerAnglesHint: {x: 5.157, y: -12.221, z: -0.643}
 --- !u!1001 &1756911573762483095
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -344,6 +375,30 @@ PrefabInstance:
     - target: {fileID: -6303712125523662862, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -6247900639130272199, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
       propertyPath: m_Layer
@@ -751,6 +806,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3734404284889936367}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4327707569414380964}
     - targetCorrespondingSourceObject: {fileID: 452845707996361441, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1822409363207415176}
@@ -783,6 +841,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 421844406327360560}
   m_SourcePrefab: {fileID: 100100000, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+--- !u!4 &556822155869227931 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+  m_PrefabInstance: {fileID: 3382464818649255585}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2463895629111587824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
@@ -838,6 +901,8 @@ MonoBehaviour:
   Weapon: {fileID: 0}
   isattacking: 0
   canMove: 1
+  aimining: 0
+  RigBody: {fileID: 556822155869227931}
 --- !u!143 &7028893602081611834
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1044,6 +1109,8 @@ MonoBehaviour:
   LevelUp: {fileID: 1674294146206441103}
   LevelDown: {fileID: 8118343241677041756}
   BasicHit: {fileID: 5280871719968722011}
+  AimCamPosition: {fileID: 3138988724986903123}
+  arrowForce: 700
 --- !u!4 &2934157904421764160 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 452845707996361441, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}

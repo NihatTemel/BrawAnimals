@@ -45,10 +45,14 @@ public class PlayerMainController : NetworkBehaviour
     public bool isattacking = false;
 
     [SyncVar] public bool canMove = true;
+    public bool aimining;
+    public Transform RigBody;
+
 
     private void Start()
     {
         StartingSettings();
+
     }
 
     void StartingSettings()
@@ -63,6 +67,10 @@ public class PlayerMainController : NetworkBehaviour
 
         StaminaImg = GameObject.Find("Stamina").GetComponent<Image>();
         controller = GetComponent<CharacterController>();
+
+        aimining=transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>().aiming;
+
+        
 
         playername = transform.root.GetComponent<OnlinePrefabLobbyController>().playerName;
         CmdSetPlayerName();
@@ -83,50 +91,83 @@ public class PlayerMainController : NetworkBehaviour
         nametext.text = playername;
     }
 
+    private float xRotation = 0f;
+
+
+
     private void Update()
     {
-        if (nametext != null) 
-        {
-            //nametext.transform.LookAt(CharacterCamera.transform);
-            CmdSetPlayerName();
-        }
-
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
 
+        float mouseSensitivity = 1f;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        bool isAiming = CharacterCamera.GetComponent<TPSCameraFollow>().Aiming;
+
+        if (isAiming)
+        {
+            // FPS gibi yukarý-aþaðý bakýþ
+            xRotation -= mouseY;
+            xRotation = Mathf.Clamp(xRotation, -80f, 80f);
+            CharacterCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            transform.Rotate(Vector3.up * mouseX); // FPS gibi dönüþ
+        }
+
+        // Zemin kontrolü
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
-        if (!canMove) 
+
+        if (!canMove)
         {
             horizontal = 0;
             vertical = 0;
         }
-        
 
-        Vector3 cameraForward = CharacterCamera.transform.forward;
-        Vector3 cameraRight = CharacterCamera.transform.right;
-        cameraForward.y = 0f;
-        cameraRight.y = 0f;
-        cameraForward.Normalize();
-        cameraRight.Normalize();
+        Vector3 moveDirection;
 
-        Vector3 moveDirection = (cameraForward * vertical + cameraRight * horizontal).normalized;
+        if (isAiming)
+        {
+            RigBody.localRotation = Quaternion.Euler(-90, 40, 0);
+            moveDirection = (transform.forward * vertical + transform.right * horizontal).normalized;
+
+             
+            walkSpeed = 1.5f;
+            runSpeed = 3f;
+
+        }
+        else
+        {
+            RigBody.localRotation = Quaternion.Euler(-90, 0, 0);
+            // TPS tarzý kamera yönü bazlý hareket
+            Vector3 cameraForward = CharacterCamera.transform.forward;
+            Vector3 cameraRight = CharacterCamera.transform.right;
+            cameraForward.y = 0f;
+            cameraRight.y = 0f;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+            moveDirection = (cameraForward * vertical + cameraRight * horizontal).normalized;
+
+            walkSpeed = 5f;
+            runSpeed = 9f;
+
+
+        }
 
         bool isMoving = moveDirection.magnitude > 0.1f;
         bool shiftPressed = Input.GetKey(KeyCode.LeftShift);
         bool canRun = shiftPressed && stamina > staminaThreshold && isMoving;
-
         float currentSpeed = canRun ? runSpeed : walkSpeed;
 
-        // Hareket
-
+        // Hareket uygula
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
-        // Yöne dön
-        if (moveDirection != Vector3.zero)
+        // TPS modunda yürürken karakter kamera yönüne dönsün
+        if (moveDirection != Vector3.zero && !isAiming)
         {
             Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
@@ -143,7 +184,7 @@ public class PlayerMainController : NetworkBehaviour
         velocity.y += gravity * Time.deltaTime;
         controller.Move(new Vector3(0, velocity.y, 0) * Time.deltaTime);
 
-        // Stamina Güncelleme
+        // Stamina
         if (canRun)
         {
             stamina -= staminaDrainRate * Time.deltaTime;
@@ -155,7 +196,6 @@ public class PlayerMainController : NetworkBehaviour
             stamina += staminaRecoverRate * Time.deltaTime;
             stamina = Mathf.Clamp01(stamina);
             CmdSetVfxVisible(false);
-
         }
 
         if (StaminaImg != null)
@@ -184,16 +224,19 @@ public class PlayerMainController : NetworkBehaviour
             }
         }
 
-        if (nametext != null) 
+        // Ýsim etiketi
+        if (nametext != null)
         {
             nametext.transform.LookAt(CharacterCamera.transform);
             CmdSetPlayerName();
         }
+
         AttackActive();
         AttackPlayer();
     }
 
-    
+
+
 
     void AttackActive() 
     {
