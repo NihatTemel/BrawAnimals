@@ -71,6 +71,7 @@ public class OnlinePrefabLobbyController : NetworkBehaviour
         Debug.Log($"[Server] Oyuncu {netId} ready durumu: {readyState}");
     }
 
+
     [Command(requiresAuthority = false)]
     public void CmdSpawnSelectedCharacter(int index)
     {

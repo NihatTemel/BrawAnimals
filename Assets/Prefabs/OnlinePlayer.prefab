@@ -30,6 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8146701606616069252}
+  - {fileID: 276538660502715195}
   m_Father: {fileID: 1180204519228833188}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1549858698851583744
@@ -187,6 +188,8 @@ MonoBehaviour:
   rotationSpeed: 5
   minY: -15
   maxY: 50
+  aiming: 0
+  AimingPositiion: {fileID: 8394599643782718272}
 --- !u!1 &2408436089125993145
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +317,8 @@ MonoBehaviour:
   characterList:
   - {fileID: 4704736894396767321, guid: 591829ae9677a7044a87857b0f21a6a7, type: 3}
   - {fileID: 2463895629111587824, guid: 0d12493099f32fa4baeffa6a7f7cf101, type: 3}
+  - {fileID: 4704736894396767321, guid: 2ce30fd5ff2b0954ea407f3e03a7d332, type: 3}
+  - {fileID: 2463895629111587824, guid: 0ca71f0052c006249afe39b4e25c1a0e, type: 3}
   currentCharacterIdentity: {fileID: 0}
   currentCharacter: {fileID: 0}
   isReady: 0
@@ -353,6 +358,7 @@ MonoBehaviour:
   syncInterval: 0
   GameSceneNames:
   - Apple Game
+  - Bow Game
 --- !u!114 &4976344766701448510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,3 +378,34 @@ MonoBehaviour:
   LastSceneLeadership: 0
   GameScore: 0
   ScoreUpdate: 0
+--- !u!1 &8394599643782718272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 276538660502715195}
+  m_Layer: 0
+  m_Name: BowAimCameraPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &276538660502715195
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8394599643782718272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.03116559, y: -0.23881519, z: 0.0076687834, w: 0.9705345}
+  m_LocalPosition: {x: -3.419, y: -2.807, z: -17.515}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8008548806507587619}
+  m_LocalEulerAnglesHint: {x: 3.678, y: -27.648, z: 0}

@@ -38,6 +38,11 @@ public class OnlinePlayerCharacterSpawner : NetworkBehaviour
             {
                 PlayerPrefs.SetInt("LastSceneScore", 0);
                 int index = PlayerPrefs.GetInt("selectedCharacter");
+
+                int n = SceneManager.GetActiveScene().buildIndex;
+
+                index = index + ((n - 3) * 2);
+
                 GetComponent<OnlinePrefabLobbyController>().CmdSpawnSelectedCharacter(index);
                 hasSpawned = true; // Spawnlandý olarak iþaretle
             }

@@ -719,7 +719,7 @@ MonoBehaviour:
   nametext: {fileID: 1825193681511467339}
   playername: 
   weaponactive: 0
-  weaponactivelimit: 5
+  weaponactivelimit: 1
   weaponactivecurrent: 0
   Weapon: {fileID: 0}
   isattacking: 0
