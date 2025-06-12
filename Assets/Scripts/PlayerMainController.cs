@@ -240,6 +240,8 @@ public class PlayerMainController : NetworkBehaviour
 
     void AttackActive() 
     {
+       
+
         if (!weaponactive)
         {
             if (weaponactivecurrent < weaponactivelimit)
@@ -256,9 +258,13 @@ public class PlayerMainController : NetworkBehaviour
         }
     }
 
-    void AttackPlayer() 
+    public void AttackPlayer() 
     {
-        if (Input.GetMouseButtonDown(0) && !isattacking && weaponactive) 
+        AppleGameControl appleGameControl = GetComponent<AppleGameControl>();
+
+        
+       
+        if (Input.GetMouseButtonDown(0) && !isattacking && weaponactive && appleGameControl.enabled) 
         {
             weaponactivecurrent = 0;
             PlayAnimationByIndex(5);
@@ -269,6 +275,42 @@ public class PlayerMainController : NetworkBehaviour
 
         }
     }
+
+    public void AttackBow() 
+    {
+        if (!isattacking && weaponactive) 
+        {
+            Debug.Log("test bow");
+
+            weaponactivecurrent = 0;
+            PlayAnimationByIndex(5);
+
+            float attackDuration = currentAnimationClips[5].length;
+
+            Invoke("BowHide", 1);
+
+           
+        }
+            
+    }
+
+    
+
+    void AttackBowEnd() 
+    {
+        isattacking = false;
+
+       
+        
+    }
+
+    void BowHide() 
+    {
+        weaponactive = false;
+        CmdSetWeaponVisible(false);
+        Invoke("AttackBowEnd", 4);
+    }
+
 
     void attackEnd() 
     {

@@ -1097,7 +1097,7 @@ MonoBehaviour:
   Arrow: {fileID: 5145887629330841202, guid: c53a061674f891a4d8df98c58427815e, type: 3}
   trailObject: {fileID: 0}
   weaponactive: 0
-  weaponactivelimit: 5
+  weaponactivelimit: 1
   weaponactivecurrent: 0
   isattacking: 0
   CanvasGameScene: {fileID: 0}

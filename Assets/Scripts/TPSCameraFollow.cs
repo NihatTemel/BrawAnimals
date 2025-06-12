@@ -18,15 +18,25 @@ public class TPSCameraFollow : MonoBehaviour
     public float AimingRight = 1;
     public float AimingUp;
 
-    private Transform aimCamTarget;
+    public Transform aimCamTarget;
+    public Vector3 aimOffsetFromCamera;
 
     void Start()
     {
         var character = transform.root.GetComponent<OnlinePrefabLobbyController>().currentCharacter;
+        target = character.transform;
+
         if (character != null)
         {
-            target = character.transform;
-            aimCamTarget = character.GetComponent<BowGameControl>().AimCamPosition.transform;
+            BowGameControl bowControl = character.GetComponent<BowGameControl>();
+            if (bowControl != null && bowControl.isActiveAndEnabled)
+            {
+                target = character.transform;
+                aimCamTarget = character.GetComponent<BowGameControl>().AimCamPosition.transform;
+
+                // Kamera ile aimCamTarget arasýndaki farký al
+                aimOffsetFromCamera = aimCamTarget.position - transform.position;
+            }
         }
     }
 
@@ -46,8 +56,10 @@ public class TPSCameraFollow : MonoBehaviour
         currentPitch -= mouseY;
         currentPitch = Mathf.Clamp(currentPitch, minY, maxY);
 
-        // Kamera karakterin pozisyonuna göre ayarlanýr, sadece yukarý-aþaðý bakar
-        transform.position = target.position + target.TransformDirection(AimoffSet);
+        aimOffsetFromCamera = new Vector3(1.18200004f, 1.46000004f, -1.76699996f);
+        Vector3 aimingPosition = target.position + target.rotation * aimOffsetFromCamera;
+
+        transform.position = aimingPosition;
         transform.rotation = Quaternion.Euler(currentPitch, target.eulerAngles.y, 0f);
     }
 

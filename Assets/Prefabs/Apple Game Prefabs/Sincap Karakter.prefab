@@ -2883,6 +2883,8 @@ MonoBehaviour:
   Weapon: {fileID: 0}
   isattacking: 0
   canMove: 1
+  aimining: 0
+  RigBody: {fileID: 595427397003581315}
 --- !u!114 &6937064824892369904
 MonoBehaviour:
   m_ObjectHideFlags: 0

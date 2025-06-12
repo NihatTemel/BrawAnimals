@@ -106,38 +106,38 @@ public class BowGameControl : NetworkBehaviour
     }
 
 
+    bool Aiming = false;
+
     void SettingAim() 
     {
         if (!canGetHit) return;
 
-        if (!isattacking)
-        {
-            //CmdSetTrailState(false);
-            return;
-
-        }
+        if (weaponactivelimit >= weaponactivecurrent) return;
+        
 
         //GameObject TpsCamera = GetComponent<OnlinePrefabController>().TPSCamera;
         TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
 
         TpsFollow.aiming = true;
-
+        Aiming = true;
     }
 
     void AttackEnemy()
     {
+
+        
+        if (!canGetHit || isattacking || !Aiming) return;
+        
+
+        isattacking = true;
+
+
+        GetComponent<PlayerMainController>().AttackBow();
+
         TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
 
         TpsFollow.aiming = false;
-        if (!canGetHit) return;
-
-        if (!isattacking)
-        {
-            //CmdSetTrailState(false);
-            return;
-
-        }
-
+        Aiming = false;
         CmdShootArrow();
     }
     public float arrowForce = 700f;

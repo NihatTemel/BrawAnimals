@@ -669,6 +669,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: -3802913421777300172}
   m_SourcePrefab: {fileID: 100100000, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+--- !u!4 &556822155869227931 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6247945034147084998, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
+  m_PrefabInstance: {fileID: 3382464818649255585}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2463895629111587824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 85414a8463a4b1145aadbf305f6acc92, type: 3}
@@ -724,6 +729,8 @@ MonoBehaviour:
   Weapon: {fileID: 0}
   isattacking: 0
   canMove: 1
+  aimining: 0
+  RigBody: {fileID: 556822155869227931}
 --- !u!143 &7028893602081611834
 CharacterController:
   m_ObjectHideFlags: 0

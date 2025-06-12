@@ -2784,6 +2784,7 @@ Transform:
   - {fileID: 6969539233454604264}
   - {fileID: 2426040565712688538}
   - {fileID: 2816479588264352359}
+  - {fileID: 289312527111248029}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3344777642911767371
@@ -2883,6 +2884,8 @@ MonoBehaviour:
   Weapon: {fileID: 0}
   isattacking: 0
   canMove: 1
+  aimining: 0
+  RigBody: {fileID: 595427397003581315}
 --- !u!114 &6937064824892369904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3064,6 +3067,7 @@ MonoBehaviour:
   LevelUp: {fileID: 8590548228289536748}
   LevelDown: {fileID: 5860975937089069569}
   BasicHit: {fileID: 562688020286260272}
+  AimCamPosition: {fileID: 5005064038845758517}
   arrowForce: 700
 --- !u!1 &4730290981345326364
 GameObject:
@@ -3375,6 +3379,37 @@ Transform:
   - {fileID: 3019580753873591638}
   m_Father: {fileID: 5481996274154463577}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5005064038845758517
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 289312527111248029}
+  m_Layer: 6
+  m_Name: BowCamPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &289312527111248029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005064038845758517}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.045325067, y: 0.10608682, z: 0.00078418374, w: -0.993323}
+  m_LocalPosition: {x: 9.269939, y: 1.6880001, z: 8.021002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7180435639813165842}
+  m_LocalEulerAnglesHint: {x: 5.157, y: -12.221, z: -0.643}
 --- !u!1 &5390718126255922610
 GameObject:
   m_ObjectHideFlags: 0
