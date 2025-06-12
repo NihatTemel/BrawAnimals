@@ -21,6 +21,11 @@ public class TPSCameraFollow : MonoBehaviour
     public Transform aimCamTarget;
     public Vector3 aimOffsetFromCamera;
 
+
+    public float Looky=1.5f;
+    public float Lookz=1.5f;
+
+
     void Start()
     {
         var character = transform.root.GetComponent<OnlinePrefabLobbyController>().currentCharacter;
@@ -51,6 +56,16 @@ public class TPSCameraFollow : MonoBehaviour
     void SetAimingView()
     {
         if (target == null) return;
+        Vector3 lookDir = transform.forward;
+
+        Debug.Log("1--> " + lookDir);
+        Debug.Log("2--> " + target.rotation);
+
+
+       
+
+
+        Debug.Log("3--> " + target.rotation);
 
         float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
         currentPitch -= mouseY;
@@ -78,7 +93,7 @@ public class TPSCameraFollow : MonoBehaviour
         Vector3 desiredPosition = target.position + rotation * offset;
 
         transform.position = desiredPosition;
-        transform.LookAt(target.position + Vector3.up * 1.5f);
+        transform.LookAt(target.position + Vector3.up * Looky + Vector3.right*Lookz);
     }
 
     public bool Aiming => aiming;

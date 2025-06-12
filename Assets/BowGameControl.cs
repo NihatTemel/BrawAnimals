@@ -120,6 +120,9 @@ public class BowGameControl : NetworkBehaviour
 
         TpsFollow.aiming = true;
         Aiming = true;
+
+        transform.rotation = AppleGameCamera.transform.rotation;
+
     }
 
     void AttackEnemy()
