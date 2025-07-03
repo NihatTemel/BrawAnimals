@@ -74,7 +74,7 @@ public class AppleGameControl : NetworkBehaviour
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
 
         weaponactive = GetComponent<PlayerMainController>().weaponactive;
-        weaponactivelimit = GetComponent<PlayerMainController>().weaponactivelimit;
+        //weaponactivelimit = GetComponent<PlayerMainController>().weaponactivelimit;
         weaponactivecurrent = GetComponent<PlayerMainController>().weaponactivecurrent;
         isattacking = GetComponent<PlayerMainController>().isattacking;
 

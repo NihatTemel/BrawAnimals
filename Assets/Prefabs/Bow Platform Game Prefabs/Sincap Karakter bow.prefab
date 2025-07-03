@@ -3063,7 +3063,7 @@ MonoBehaviour:
   KurekFillText: {fileID: 0}
   canGetHit: 1
   appleObj: {fileID: 5491222047378257624, guid: db73e5d4dabe91b47b7b8a54048b663f, type: 3}
-  AppleGameCamera: {fileID: 0}
+  BowGameCamera: {fileID: 0}
   LevelUp: {fileID: 8590548228289536748}
   LevelDown: {fileID: 5860975937089069569}
   BasicHit: {fileID: 562688020286260272}

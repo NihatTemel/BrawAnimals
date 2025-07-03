@@ -3,7 +3,9 @@ using UnityEngine;
 public class TPSCameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset = new Vector3(0, 2, -5);
+    public Vector3 offset = new Vector3(0, 2, -5); // Third person offset
+    public Vector3 aimOffset = new Vector3(1.18200004f, 1.46000004f, -1.76699996f); // Aiming offset
+
     public float rotationSpeed = 5f;
     public float minY = -35f;
     public float maxY = 60f;
@@ -12,19 +14,21 @@ public class TPSCameraFollow : MonoBehaviour
     private float currentPitch = 10f;
 
     public bool aiming = false;
-
     public GameObject AimingPosition;
-    public Vector3 AimoffSet = new Vector3(1, 1, -1);
-    public float AimingRight = 1;
-    public float AimingUp;
+
+    public float Looky = 1.5f;
+    public float Lookz = 1.5f;
+
+    bool changingaim = false;
+
+    private float transitionSpeed = 5f;
+    private float transitionProgress = 0f;
+
+    private Vector3 currentOffset; // <--- EKLENDÝ
+    private Vector3 transitionStartOffset;
+    private bool isTransitioning = false;
 
     public Transform aimCamTarget;
-    public Vector3 aimOffsetFromCamera;
-
-
-    public float Looky=1.5f;
-    public float Lookz=1.5f;
-
 
     void Start()
     {
@@ -38,15 +42,37 @@ public class TPSCameraFollow : MonoBehaviour
             {
                 target = character.transform;
                 aimCamTarget = character.GetComponent<BowGameControl>().AimCamPosition.transform;
-
-                // Kamera ile aimCamTarget arasýndaki farký al
-                aimOffsetFromCamera = aimCamTarget.position - transform.position;
             }
         }
+
+        currentOffset = offset; // Baþlangýçta third-person offset
     }
 
     void LateUpdate()
     {
+        if (aiming != changingaim)
+        {
+            changingaim = aiming;
+            isTransitioning = true;
+            transitionProgress = 0f;
+            transitionStartOffset = currentOffset;
+        }
+
+        if (isTransitioning)
+        {
+            transitionProgress += Time.deltaTime * transitionSpeed;
+
+            if (transitionProgress >= 1f)
+            {
+                transitionProgress = 1f;
+                isTransitioning = false;
+            }
+
+            // Smooth offset geçiþi
+            Vector3 targetOffset = aiming ? aimOffset : offset;
+            currentOffset = Vector3.Lerp(transitionStartOffset, targetOffset, transitionProgress);
+        }
+
         if (aiming)
             SetAimingView();
         else
@@ -56,24 +82,12 @@ public class TPSCameraFollow : MonoBehaviour
     void SetAimingView()
     {
         if (target == null) return;
-        Vector3 lookDir = transform.forward;
-
-        Debug.Log("1--> " + lookDir);
-        Debug.Log("2--> " + target.rotation);
-
-
-       
-
-
-        Debug.Log("3--> " + target.rotation);
 
         float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
         currentPitch -= mouseY;
         currentPitch = Mathf.Clamp(currentPitch, minY, maxY);
 
-        aimOffsetFromCamera = new Vector3(1.18200004f, 1.46000004f, -1.76699996f);
-        Vector3 aimingPosition = target.position + target.rotation * aimOffsetFromCamera;
-
+        Vector3 aimingPosition = target.position + target.rotation * currentOffset;
         transform.position = aimingPosition;
         transform.rotation = Quaternion.Euler(currentPitch, target.eulerAngles.y, 0f);
     }
@@ -90,10 +104,10 @@ public class TPSCameraFollow : MonoBehaviour
         currentPitch = Mathf.Clamp(currentPitch, minY, maxY);
 
         Quaternion rotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
-        Vector3 desiredPosition = target.position + rotation * offset;
+        Vector3 desiredPosition = target.position + rotation * currentOffset;
 
         transform.position = desiredPosition;
-        transform.LookAt(target.position + Vector3.up * Looky + Vector3.right*Lookz);
+        transform.LookAt(target.position + Vector3.up * Looky + Vector3.right * Lookz);
     }
 
     public bool Aiming => aiming;

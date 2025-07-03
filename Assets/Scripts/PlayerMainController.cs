@@ -287,7 +287,7 @@ public class PlayerMainController : NetworkBehaviour
 
             float attackDuration = currentAnimationClips[5].length;
 
-            Invoke("BowHide", 1);
+            Invoke("BowHide", attackDuration);
 
            
         }
@@ -308,7 +308,8 @@ public class PlayerMainController : NetworkBehaviour
     {
         weaponactive = false;
         CmdSetWeaponVisible(false);
-        Invoke("AttackBowEnd", 4);
+        isattacking = false;
+       // Invoke("AttackBowEnd", 4);
     }
 
 

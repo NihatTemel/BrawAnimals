@@ -263,7 +263,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d103fb4ca8271594dba0ec8b6dc1f3dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpeed: 1750
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  arrowSpeed: 3333
   destroyAfterSeconds: 5
 --- !u!54 &1941665476365713148
 Rigidbody:

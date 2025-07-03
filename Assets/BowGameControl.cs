@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using System.Collections;
+
 public class BowGameControl : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnAppleCountChanged))] public int applecount = 1;
@@ -37,7 +38,7 @@ public class BowGameControl : NetworkBehaviour
 
     private int previousStep = 0;
 
-    public GameObject AppleGameCamera;
+    public GameObject BowGameCamera;
 
     [Header("Vfx effects")]
     public ParticleSystem LevelUp;
@@ -46,19 +47,34 @@ public class BowGameControl : NetworkBehaviour
 
     public GameObject AimCamPosition;
 
+    public bool _isLocal = false;
+
     void Start()
     {
+
+
+
         GetComponent<PlayerMainController>().Weapon = Kurek;
         trailObject = Kurek.transform.GetChild(0).gameObject;
         CanvasGameScene = GameObject.Find("CanvasGameScene");
         KurekImgFill = CanvasGameScene.GetComponent<BowGameCanvas>().KurekFillImg;
         KurekFillText = CanvasGameScene.GetComponent<BowGameCanvas>().KurekFillText;
 
-        AppleGameCamera = transform.root.GetComponent<OnlinePrefabController>().TPSCamera;
 
-
+        CameraStartSettings();
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    void CameraStartSettings() 
+    {
+      //  transform.root.GetComponent<OnlinePrefabController>().TPSCamera.SetActive(false);
+        BowGameCamera = transform.root.GetComponent<OnlinePrefabController>().TPSCamera;
+        if(transform.root.GetComponent<OnlinePrefabController>().isLocalPlayer)
+            BowGameCamera.SetActive(true);
+        
+        //BowGameCamera.GetComponent<Cine>
+
     }
 
 
@@ -78,26 +94,18 @@ public class BowGameControl : NetworkBehaviour
         if (!transform.root.GetComponent<OnlinePrefabController>()._local) return;
 
         weaponactive = GetComponent<PlayerMainController>().weaponactive;
-        weaponactivelimit = GetComponent<PlayerMainController>().weaponactivelimit;
+        //weaponactivelimit = GetComponent<PlayerMainController>().weaponactivelimit;
         weaponactivecurrent = GetComponent<PlayerMainController>().weaponactivecurrent;
         isattacking = GetComponent<PlayerMainController>().isattacking;
 
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            CmdCollectApple();
-        }
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            CmdLoseApple();
-        }
-
+       
         UpdateCooldownUI();
 
 
         if (Input.GetMouseButtonDown(0))
             SettingAim();
         if (Input.GetMouseButtonUp(0))
-            AttackEnemy();
+            StartCoroutine( AttackEnemy());
 
         
        
@@ -121,62 +129,70 @@ public class BowGameControl : NetworkBehaviour
         TpsFollow.aiming = true;
         Aiming = true;
 
-        transform.rotation = AppleGameCamera.transform.rotation;
+        Vector3 currentEuler = transform.rotation.eulerAngles;
+        Vector3 targetEuler = BowGameCamera.transform.rotation.eulerAngles;
 
+        // Sadece Y ve Z'yi al, X sabit kalsýn
+        transform.rotation = Quaternion.Euler(currentEuler.x, targetEuler.y, targetEuler.z);
     }
 
-    void AttackEnemy()
+    IEnumerator AttackEnemy()
     {
 
-        
-        if (!canGetHit || isattacking || !Aiming) return;
-        
+        yield return null;
+        if (!canGetHit || isattacking || !Aiming) 
+        {
+            Debug.Log("return attack !");
+        }
+        else 
+        {
+            isattacking = true;
 
-        isattacking = true;
+
+            GetComponent<PlayerMainController>().AttackBow();
+
+            TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
+
+            ShootArrow();
+
+            yield return new WaitForSeconds(0.55f);
+            Aiming = false;
+            TpsFollow.aiming = false;
+
+        }
 
 
-        GetComponent<PlayerMainController>().AttackBow();
 
-        TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
 
-        TpsFollow.aiming = false;
-        Aiming = false;
-        CmdShootArrow();
+
     }
     public float arrowForce = 700f;
-
     [Command(requiresAuthority = false)]
-    public void CmdShootArrow()
+    public void CmdShootArrow(Vector3 spawnPos, Vector3 direction)
     {
+        GameObject arrowObj = Instantiate(Arrow, spawnPos, Quaternion.LookRotation(direction));
 
-        Debug.Log("shoot arrow");
+        NetworkServer.Spawn(arrowObj);
+
+        if (arrowObj.TryGetComponent(out ArrowController arrow))
+        {
+            arrow.ArrowStartHelper(spawnPos, direction);
+        }
+    }
+
+    public void ShootArrow()
+    {
+        if (!transform.root.GetComponent<OnlinePrefabController>().isLocalPlayer) return;
 
         Vector3 spawnPos = Kurek.transform.position;
 
-        // Kamera merkezine doðru yön belirle
-        Ray ray = AppleGameCamera.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        Vector3 direction = ray.direction;
+        Ray ray = BowGameCamera.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
 
-        Debug.DrawRay(ray.origin, direction * 100f, Color.red, 2f);
-        // Ok objesini oluþtur
-        GameObject arrowObj = Instantiate(Arrow, spawnPos, Quaternion.LookRotation(direction));
+        Vector3 targetPoint = Physics.Raycast(ray, out hit, 100f) ? hit.point : ray.origin + ray.direction * 100f;
+        Vector3 direction = (targetPoint - spawnPos).normalized;
 
-
-
-        TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
-
-        TpsFollow.aiming = false;
-
-        NetworkServer.Spawn(arrowObj);
-    }
-
-    // Client tarafýnda tetiklenir
-    public void ShootArrow()
-    {
-        if (isLocalPlayer)
-        {
-            CmdShootArrow(); // server'a bildir
-        }
+        CmdShootArrow(spawnPos, direction);
     }
 
 
@@ -342,7 +358,7 @@ public class BowGameControl : NetworkBehaviour
 
 
             // Kamera offset ayarý
-            TPSCameraFollow cameraFollow = AppleGameCamera.GetComponent<TPSCameraFollow>();
+            TPSCameraFollow cameraFollow = BowGameCamera.GetComponent<TPSCameraFollow>();
             if (cameraFollow != null)
             {
                 Vector3 baseOffset = new Vector3(0, 2f, -5f);
@@ -393,5 +409,31 @@ public class BowGameControl : NetworkBehaviour
     {
         BasicHit.Play();
     }
+
+    GameObject touchBlock = null;
+
+    [Command(requiresAuthority = false)]
+    void CmdBreakBlock() 
+    {
+        RpcBreakBlock();
+    }
+    [ClientRpc]
+    void RpcBreakBlock() 
+    {
+        touchBlock.gameObject.SetActive(false);
+        touchBlock.transform.parent.GetChild(0).gameObject.SetActive(true);
+    }
+
+
+
+    public void OnCollisionEnter(Collision collision)
+    {
+       // Debug.Log("touch -> " + collision.gameObject.name);
+        if (collision.collider.tag == "ArenaBlock") 
+        {
+            collision.gameObject.transform.parent.GetComponent<FloorBlockController>().CmdBreakBlock();
+        }
+    }
+
 
 }

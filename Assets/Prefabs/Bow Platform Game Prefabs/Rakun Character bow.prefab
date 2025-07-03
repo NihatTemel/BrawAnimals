@@ -994,7 +994,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1105,7 +1105,7 @@ MonoBehaviour:
   KurekFillText: {fileID: 0}
   canGetHit: 1
   appleObj: {fileID: 5491222047378257624, guid: db73e5d4dabe91b47b7b8a54048b663f, type: 3}
-  AppleGameCamera: {fileID: 0}
+  BowGameCamera: {fileID: 0}
   LevelUp: {fileID: 1674294146206441103}
   LevelDown: {fileID: 8118343241677041756}
   BasicHit: {fileID: 5280871719968722011}

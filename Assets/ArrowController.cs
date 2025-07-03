@@ -1,6 +1,6 @@
 using UnityEngine;
-
-public class ArrowController : MonoBehaviour
+using Mirror;
+public class ArrowController : NetworkBehaviour
 {
     [SerializeField] public float arrowSpeed = 700f;
     [SerializeField] public float destroyAfterSeconds = 5f;
@@ -9,6 +9,26 @@ public class ArrowController : MonoBehaviour
 
     void Start()
     {
+        
+
+        
+    }
+
+    
+
+
+    [Command(requiresAuthority = false)]
+    public void ArrowStartHelper(Vector3 spawnPos, Vector3 direction) 
+    {
+        RpcArrowStartHelper(spawnPos, direction);
+    }
+
+    [ClientRpc]
+    void RpcArrowStartHelper(Vector3 spawnPos, Vector3 direction) 
+    {
+        transform.position = spawnPos;
+        Quaternion.LookRotation(direction);
+
         rb = GetComponent<Rigidbody>();
 
         // Apply force in the arrow's forward direction
@@ -18,9 +38,10 @@ public class ArrowController : MonoBehaviour
             rb.AddForce(transform.forward * arrowSpeed);
         }
 
-        // Destroy arrow after some time to prevent clutter
-       // Destroy(gameObject, destroyAfterSeconds);
     }
+
+
+
 
     public void ShootArrow(float ShootingPower) 
     {
@@ -41,4 +62,19 @@ public class ArrowController : MonoBehaviour
         // Optionally destroy after hitting something
         // Destroy(gameObject, 2f);
     }
+
+
+
+
+    public void OnTriggerEnter(Collider other)
+    {
+        // Debug.Log("touch -> " + collision.gameObject.name);
+        if (other.tag == "ArenaBlock")
+        {
+            other.gameObject.transform.parent.GetComponent<FloorBlockController>().CmdArrowBreakBlock();
+            
+        }
+    }
+
+
 }

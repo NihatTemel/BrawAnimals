@@ -7,7 +7,7 @@ public class OnlinePrefabController : NetworkBehaviour
 
     public GameObject CameraHolder;
     public GameObject TPSCamera;
-
+    public GameObject cinemachineCamera;
     void Start()
     {
         if (isLocalPlayer)
