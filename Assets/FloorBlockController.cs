@@ -19,7 +19,7 @@ public class FloorBlockController : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdBreakBlock()
     {
-        //RpcBreakBlock();
+        RpcBreakBlock();
     }
 
     [ClientRpc]
@@ -35,7 +35,7 @@ public class FloorBlockController : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdArrowBreakBlock()
     {
-      // RpcArrowBreakBlock();
+       RpcArrowBreakBlock();
     }
 
     [ClientRpc]
