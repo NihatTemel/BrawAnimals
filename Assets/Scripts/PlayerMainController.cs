@@ -282,6 +282,7 @@ public class PlayerMainController : NetworkBehaviour
         {
             Debug.Log("test bow");
 
+            isattacking = true;
             weaponactivecurrent = 0;
             PlayAnimationByIndex(5);
 

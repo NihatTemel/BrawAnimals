@@ -54,9 +54,17 @@ public class BowGameControl : NetworkBehaviour
 
 
 
+
+
+
         GetComponent<PlayerMainController>().Weapon = Kurek;
+        GetComponent<PlayerMainController>().weaponactivelimit = weaponactivelimit;
+        
+
+
         trailObject = Kurek.transform.GetChild(0).gameObject;
         CanvasGameScene = GameObject.Find("CanvasGameScene");
+        
         KurekImgFill = CanvasGameScene.GetComponent<BowGameCanvas>().KurekFillImg;
         KurekFillText = CanvasGameScene.GetComponent<BowGameCanvas>().KurekFillText;
 
@@ -147,7 +155,7 @@ public class BowGameControl : NetworkBehaviour
         else 
         {
             isattacking = true;
-
+           // GetComponent<PlayerMainController>().isattacking = true;
 
             GetComponent<PlayerMainController>().AttackBow();
 

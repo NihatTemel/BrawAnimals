@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/AppleGameScenePrefrabs/Apple Scene Back up.unity
-    guid: 594da9eac4a488a479b252ff922516d9
+    path: Assets/Scenes/death mach game.unity
+    guid: f10e245dd7ec1724cbbcc0bed2df5b03
   - enabled: 1
     path: Assets/Scenes/Lobby Menu.unity
     guid: 7dd16f2cce0ea144cab353a8825c1614

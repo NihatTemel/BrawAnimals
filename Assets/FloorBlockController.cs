@@ -162,6 +162,25 @@ public class FloorBlockController : NetworkBehaviour
         for (int i = 0; i < n; i++)
         {
             brokenroot.transform.GetChild(i).localScale = Vector3.zero;
+
         }
+
+        CmdCloseThis();
+
+
     }
+
+    [Command(requiresAuthority =false)]
+    void CmdCloseThis() 
+    {
+        RpcCloseThis();
+    }
+
+    [ClientRpc]
+    void RpcCloseThis() 
+    {
+        this.gameObject.SetActive(false);
+    }
+
+
 }
