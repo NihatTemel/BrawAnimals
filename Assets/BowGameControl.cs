@@ -54,7 +54,9 @@ public class BowGameControl : NetworkBehaviour
 
 
 
+        applecount=100;
 
+        CmdSetApple100();
 
 
         GetComponent<PlayerMainController>().Weapon = Kurek;
@@ -144,6 +146,8 @@ public class BowGameControl : NetworkBehaviour
         transform.rotation = Quaternion.Euler(currentEuler.x, targetEuler.y, targetEuler.z);
     }
 
+    bool bowcanattack = true;
+
     IEnumerator AttackEnemy()
     {
 
@@ -160,13 +164,16 @@ public class BowGameControl : NetworkBehaviour
             GetComponent<PlayerMainController>().AttackBow();
 
             TPSCameraFollow TpsFollow = transform.root.GetComponent<OnlinePrefabController>().TPSCamera.GetComponent<TPSCameraFollow>();
-
-            ShootArrow();
+            if (bowcanattack) 
+            {
+                bowcanattack = false;
+                  ShootArrow();
+            }
 
             yield return new WaitForSeconds(0.55f);
             Aiming = false;
             TpsFollow.aiming = false;
-
+            bowcanattack = true;
         }
 
 
@@ -189,9 +196,8 @@ public class BowGameControl : NetworkBehaviour
     }
     public void ShootArrow()
     {
-        // Get the main camera (or your BowGameCamera)
 
-        // Arrow spawn position (from the bow/Kurek)
+        
 
         Vector3 targetPoint = BowGameCamera.GetComponent<TPSCameraFollow>().targetPoint;
 
@@ -208,73 +214,8 @@ public class BowGameControl : NetworkBehaviour
     }
 
 
-    [Command(requiresAuthority = false)]
-    public void CmdLoseApple()
-    {
-        canGetHit = false;
-
-        GetComponent<PlayerMainController>().canMove = false;
-        int n = applecount - ((applecount) / 4);
-
-
-        applecount = applecount / 4;
-        applecount = Mathf.Max(0, applecount - 1);
-
-        for (int i = 0; i < n; i++)
-        {
-            SpawnApple();
-        }
-
-        //RpcLoseApple();
-
-        Invoke(nameof(ActiveCanGetHit), 2.5f);
-    }
-
-    [ClientRpc]
-    void RpcLoseApple()
-    {
-        int n = applecount - ((applecount) / 4);
-
-
-        applecount = applecount / 4;
-        applecount = Mathf.Max(0, applecount - 1);
-
-        for (int i = 0; i < n; i++)
-        {
-            SpawnApple();
-        }
-    }
-
-    void SpawnApple()
-    {
-        if (!isServer) return;
-
-        Debug.Log("spawn apple");
-
-        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
-        float safeDistance = 1f;
-        float colliderRadius = capsule != null ? capsule.radius : 0.5f;
-        float spawnDistance = colliderRadius + safeDistance;
-
-        Vector3 randomDirection = new Vector3(
-            Random.Range(-1f, 1f),
-            0f,
-            Random.Range(-1f, 1f)
-        ).normalized;
-
-        Vector3 spawnOffset = randomDirection * spawnDistance + Vector3.up * 0.5f;
-        Vector3 spawnPos = transform.position + spawnOffset;
-
-        GameObject newApple = Instantiate(appleObj, spawnPos, Quaternion.identity);
-        NetworkServer.Spawn(newApple);
-
-        Rigidbody rb = newApple.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            Vector3 launchForce = randomDirection * Random.Range(2f, 4f) + Vector3.up * Random.Range(2f, 5f);
-            rb.AddForce(launchForce, ForceMode.Impulse);
-        }
-    }
+   
+  
 
     void ActiveCanGetHit()
     {
@@ -302,10 +243,7 @@ public class BowGameControl : NetworkBehaviour
 
         if (other.CompareTag("Apple") && canGetHit && other.GetComponent<AppleObjController>().collectable)
         {
-            other.gameObject.tag = "Untagged";
-            //CmdDestroy(other.gameObject);
-            AppleMoveCharacter(other.gameObject);
-            CmdCollectApple();
+           
         }
     }
 
@@ -316,6 +254,12 @@ public class BowGameControl : NetworkBehaviour
             applecount++;
     }
 
+    [Command(requiresAuthority =false)]
+    void CmdSetApple100() 
+    {
+        applecount = 100;    
+    }
+
     [Command(requiresAuthority = false)]
     void CmdDestroy(GameObject obj)
     {
@@ -324,68 +268,11 @@ public class BowGameControl : NetworkBehaviour
 
 
 
-    [Command(requiresAuthority = false)]
-    void AppleMoveCharacter(GameObject apple)
-    {
-        RpcAppleMoveCharacter(apple);
-    }
-
-    [ClientRpc]
-    void RpcAppleMoveCharacter(GameObject apple)
-    {
-        apple.GetComponent<AppleObjController>().HitBoxCollider.enabled = false;
-        apple.transform.DOMove(this.transform.position, 0.3f);
-        apple.transform.DOScale(Vector3.zero, 0.3f);
-        StartCoroutine(Destroylate(apple));
-
-    }
-
-    IEnumerator Destroylate(GameObject apple)
-    {
-        yield return new WaitForSeconds(0.35f);
-        CmdDestroy(apple);
-    }
 
 
     void OnAppleCountChanged(int oldCount, int newCount)
     {
-        int currentStep = newCount / applesPerScaleStep;
-
-        if (currentStep != previousStep)
-        {
-            float newScaleValue = 1f + (currentStep * scalePerStep);
-            Vector3 targetScale = new Vector3(newScaleValue, newScaleValue, newScaleValue);
-
-            // Karakteri yumuþak þekilde büyüt
-            transform.DOScale(targetScale, 0.5f).SetEase(Ease.OutBack);
-
-            if (targetScale.y > transform.localScale.y)
-            {
-                LevelUp.Play();
-            }
-            else
-            {
-                LevelDown.Play();
-            }
-
-
-            // Kamera offset ayarý
-            TPSCameraFollow cameraFollow = BowGameCamera.GetComponent<TPSCameraFollow>();
-            if (cameraFollow != null)
-            {
-                Vector3 baseOffset = new Vector3(0, 2f, -5f);
-
-                // Daha dengeli bir uzaklaþma (daha az geri çekilme)
-                Vector3 targetOffset = baseOffset + new Vector3(0, 1.2f, -1.4f) * (newScaleValue - 1f);
-
-
-                // DOTween ile offset animasyonu
-                DOTween.To(() => cameraFollow.offset, x => cameraFollow.offset = x, targetOffset, 0.5f)
-                       .SetEase(Ease.OutSine);
-            }
-
-            previousStep = currentStep;
-        }
+        
 
         if (transform.root.GetComponent<OnlinePrefabLobbyController>().isLocalPlayer)
         {

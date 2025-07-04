@@ -93,9 +93,29 @@ public class BowGameCanvas : NetworkBehaviour
 
             TMP_Text ScoreText = panel.transform.GetChild(0).GetComponentInChildren<TMP_Text>();
             if (player.currentCharacterIdentity != null &&
-                player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>() != null)
+                player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>() != null &&
+                player.currentCharacterIdentity.GetComponent<AppleGameControl>().enabled)
             {
                 int score = player.currentCharacterIdentity.gameObject.GetComponent<AppleGameControl>().applecount;
+                ScoreText.text = score.ToString();
+
+                // Ýsteðe baðlý: Skor rengini vurgulamak için
+                if (i == 0) // En yüksek skor
+                {
+                    ScoreText.color = Color.yellow; // Veya baþka bir vurgu rengi
+                    nameText.color = Color.yellow;
+                }
+                else
+                {
+                    ScoreText.color = Color.white;
+                    nameText.color = Color.white;
+                }
+            }
+            else if (player.currentCharacterIdentity != null &&
+                player.currentCharacterIdentity.gameObject.GetComponent<BowGameControl>() != null &&
+                player.currentCharacterIdentity.GetComponent<BowGameControl>().enabled)
+            {
+                int score = player.currentCharacterIdentity.gameObject.GetComponent<BowGameControl>().applecount;
                 ScoreText.text = score.ToString();
 
                 // Ýsteðe baðlý: Skor rengini vurgulamak için

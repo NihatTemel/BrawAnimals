@@ -78,27 +78,24 @@ public class TPSCameraFollow : MonoBehaviour
             SetThirdPersonView();
 
 
+        var character = transform.root.GetComponent<OnlinePrefabLobbyController>().currentCharacter;
+        Ray ray = GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
 
-
-        Ray ray = this.gameObject.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
-
-        //Vector3 targetPoint;
-
-        // Cast the ray to find where we're aiming
-        if (Physics.Raycast(ray, out hit, 100f))
+        foreach (var h in hits)
         {
-            targetPoint = hit.point;
+            if (h.collider.transform.root == character.transform) continue;
 
+            targetPoint = h.point;
+            break;
         }
-        else
+
+        if (targetPoint == Vector3.zero)
         {
-            // If we don't hit anything, pick a point far away along the ray
             targetPoint = ray.origin + ray.direction * 100f;
         }
 
-       
-      //  Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
+
 
 
 
