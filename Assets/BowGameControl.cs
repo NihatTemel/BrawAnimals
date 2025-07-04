@@ -182,15 +182,22 @@ public class BowGameControl : NetworkBehaviour
 
     public void ShootArrow()
     {
-        if (!transform.root.GetComponent<OnlinePrefabController>().isLocalPlayer) return;
+      //  if (!transform.root.GetComponent<OnlinePrefabController>().isLocalPlayer) return;
 
-        Vector3 spawnPos = Kurek.transform.position;
+        Vector3 cameraOrigin = BowGameCamera.transform.position;
+        Vector3 cameraDirection = BowGameCamera.transform.forward;
 
-        Ray ray = BowGameCamera.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        Ray ray = new Ray(cameraOrigin, cameraDirection);
         RaycastHit hit;
 
-        Vector3 targetPoint = Physics.Raycast(ray, out hit, 100f) ? hit.point : ray.origin + ray.direction * 100f;
+        Vector3 targetPoint = Physics.Raycast(ray, out hit, 100f) ? hit.point : cameraOrigin + cameraDirection * 100f;
+
+        // spawnPos oku Kurek’ten çýkar
+        Vector3 spawnPos = Kurek.transform.position;
         Vector3 direction = (targetPoint - spawnPos).normalized;
+
+        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
+        Debug.DrawLine(spawnPos, targetPoint, Color.red, 2f);
 
         CmdShootArrow(spawnPos, direction);
     }
