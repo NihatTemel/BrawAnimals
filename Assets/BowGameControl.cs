@@ -47,7 +47,7 @@ public class BowGameControl : NetworkBehaviour
 
     public GameObject AimCamPosition;
 
-    public bool _isLocal = false;
+    //public bool _isLocal = false;
 
     void Start()
     {
@@ -179,25 +179,22 @@ public class BowGameControl : NetworkBehaviour
             arrow.ArrowStartHelper(spawnPos, direction);
         }
     }
-
     public void ShootArrow()
     {
-      //  if (!transform.root.GetComponent<OnlinePrefabController>().isLocalPlayer) return;
+        // Get the main camera (or your BowGameCamera)
 
-        Vector3 cameraOrigin = BowGameCamera.transform.position;
-        Vector3 cameraDirection = BowGameCamera.transform.forward;
+        // Arrow spawn position (from the bow/Kurek)
 
-        Ray ray = new Ray(cameraOrigin, cameraDirection);
-        RaycastHit hit;
+        Vector3 targetPoint = BowGameCamera.GetComponent<TPSCameraFollow>().targetPoint;
 
-        Vector3 targetPoint = Physics.Raycast(ray, out hit, 100f) ? hit.point : cameraOrigin + cameraDirection * 100f;
-
-        // spawnPos oku Kurek’ten çýkar
         Vector3 spawnPos = Kurek.transform.position;
+
+        // Calculate direction from bow to target point
         Vector3 direction = (targetPoint - spawnPos).normalized;
 
-        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
-        Debug.DrawLine(spawnPos, targetPoint, Color.red, 2f);
+        // Debug visualization
+       
+    
 
         CmdShootArrow(spawnPos, direction);
     }

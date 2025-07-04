@@ -3,12 +3,12 @@ using UnityEngine;
 public class TPSCameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset = new Vector3(0, 2, -5); // Third person offset
-    public Vector3 aimOffset = new Vector3(1.18200004f, 1.46000004f, -1.76699996f); // Aiming offset
+    public Vector3 offset = new Vector3(0, 2, -5);
+    public Vector3 aimOffset = new Vector3(1.182f, 1.46f, -1.767f);
 
     public float rotationSpeed = 5f;
-    public float minY = -35f;
-    public float maxY = 60f;
+    public float minY = -15f;
+    public float maxY = 50f;
 
     private float currentYaw = 0f;
     private float currentPitch = 10f;
@@ -17,14 +17,14 @@ public class TPSCameraFollow : MonoBehaviour
     public GameObject AimingPosition;
 
     public float Looky = 1.5f;
-    public float Lookz = 1.5f;
+    public float Lookz = 0f;
 
-    bool changingaim = false;
+    private bool changingaim = false;
 
     private float transitionSpeed = 5f;
     private float transitionProgress = 0f;
 
-    private Vector3 currentOffset; // <--- EKLENDÝ
+    private Vector3 currentOffset;
     private Vector3 transitionStartOffset;
     private bool isTransitioning = false;
 
@@ -41,15 +41,16 @@ public class TPSCameraFollow : MonoBehaviour
             if (bowControl != null && bowControl.isActiveAndEnabled)
             {
                 target = character.transform;
-                aimCamTarget = character.GetComponent<BowGameControl>().AimCamPosition.transform;
+                aimCamTarget = bowControl.AimCamPosition.transform;
             }
         }
 
-        currentOffset = offset; // Baþlangýçta third-person offset
+        currentOffset = offset; // Baþlangýç offset (TPS)
     }
 
     void LateUpdate()
     {
+        // Aiming deðiþtiyse transition baþlat
         if (aiming != changingaim)
         {
             changingaim = aiming;
@@ -61,14 +62,12 @@ public class TPSCameraFollow : MonoBehaviour
         if (isTransitioning)
         {
             transitionProgress += Time.deltaTime * transitionSpeed;
-
             if (transitionProgress >= 1f)
             {
                 transitionProgress = 1f;
                 isTransitioning = false;
             }
 
-            // Smooth offset geçiþi
             Vector3 targetOffset = aiming ? aimOffset : offset;
             currentOffset = Vector3.Lerp(transitionStartOffset, targetOffset, transitionProgress);
         }
@@ -77,7 +76,36 @@ public class TPSCameraFollow : MonoBehaviour
             SetAimingView();
         else
             SetThirdPersonView();
+
+
+
+
+        Ray ray = this.gameObject.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        //Vector3 targetPoint;
+
+        // Cast the ray to find where we're aiming
+        if (Physics.Raycast(ray, out hit, 100f))
+        {
+            targetPoint = hit.point;
+
+        }
+        else
+        {
+            // If we don't hit anything, pick a point far away along the ray
+            targetPoint = ray.origin + ray.direction * 100f;
+        }
+
+       
+      //  Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
+
+
+
     }
+
+    public Vector3 targetPoint;
+
 
     void SetAimingView()
     {
