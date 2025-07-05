@@ -2877,6 +2877,7 @@ MonoBehaviour:
   PlayerListRoot: {fileID: 1732717158}
   Players: []
   StartGameButton: {fileID: 2135796877}
+  SceneSelectButtonsRoot: {fileID: 0}
 --- !u!114 &933011605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6302,8 +6303,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 933011604}
-        m_TargetAssemblyTypeName: LobbyController, Assembly-CSharp
+      - m_Target: {fileID: 933011605}
+        m_TargetAssemblyTypeName: EndGameLobbyController, Assembly-CSharp
         m_MethodName: OnStartNextGameClicked
         m_Mode: 1
         m_Arguments:

@@ -89,8 +89,11 @@ public class LobbyController : MonoBehaviour
                 readyImage.color = player.isReady ? Color.green : Color.red;
 
 
+           /* if(SceneManager.GetActiveScene().name== "Lobby Menu")
+
             if(StartGameButton.activeInHierarchy)
-                StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartGameClicked);  // koþul aktif edildiðinde silinecek satýr
+                StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartGameClicked);  // koþul aktif edildiðinde silinecek satýr*/
+
             /*if (Players.Length > 1) 
             {
                 bool allready = true;
@@ -192,6 +195,22 @@ public class LobbyController : MonoBehaviour
         int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
 
         sceneIndex = FindNextScene();
+
+
+       /* string currentList = PlayerPrefs.GetString("SceneList", "");
+        string indexStr = sceneIndex.ToString();
+
+        if (currentList.Contains(indexStr))
+        {
+            SceneSelectButtonsRoot.transform.GetChild(sceneIndex - 3).GetChild(1).gameObject.SetActive(false);
+            // Çýkar: Tüm eþleþmeleri temizle
+            currentList = currentList.Replace(indexStr, "");
+            Debug.Log("Çýkarýldý: " + indexStr);
+        }
+       */
+        
+
+        Debug.Log("go scene !" +sceneIndex);
 
         // Build Settings'teki sahnelerin index aralýðýný kontrol et
         if (sceneIndex >= 0 && sceneIndex < SceneManager.sceneCountInBuildSettings)

@@ -9363,7 +9363,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  GameTimer: 75
+  GameTimer: 10
   Timer: 7
   Countdown: 3
   timerText: {fileID: 8940226097294302704}

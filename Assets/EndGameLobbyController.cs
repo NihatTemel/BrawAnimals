@@ -22,6 +22,21 @@ public class EndGameLobbyController : MonoBehaviour
     {
         InvokeRepeating(nameof(RefreshPlayers), 0f, 0.5f); // Her 2 saniyede bir kontrol
         Invoke("LoadTotalScore", 0.5f);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+
+
+        int sceneIndex = FindNextScene();
+
+       
+
+        if (sceneIndex == -1)
+        {
+
+            StartGameButton.gameObject.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = "Main Menu";
+
+        }
     }
 
 
@@ -152,11 +167,7 @@ public class EndGameLobbyController : MonoBehaviour
         bool allReady = sortedPlayers.All(x => x.Controller.isReady);
         StartGameButton.SetActive(allReady);
 
-        if (allReady)
-        {
-            StartGameButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            StartGameButton.GetComponent<Button>().onClick.AddListener(OnStartNextGameClicked);
-        }
+      
 
         int nn = 0;
         foreach (var item in PlayerVariables)
@@ -235,9 +246,19 @@ public class EndGameLobbyController : MonoBehaviour
             return;
         }
 
-        int sceneIndex = PlayerPrefs.GetInt("SceneIndex");
+        int sceneIndex = FindNextScene();
 
-        sceneIndex = 3;
+        // sceneIndex = 3;
+
+        Debug.Log("next game Index " + sceneIndex);
+
+        if(sceneIndex == -1)
+        {
+            DisconnectSelfAndGoToMenu();
+            return;
+
+        }
+
 
         foreach (var item in PlayerVariables)
         {
@@ -258,13 +279,74 @@ public class EndGameLobbyController : MonoBehaviour
                 item.ResetLastSceneScore();
             }
 
+            string currentList = PlayerPrefs.GetString("SceneList","");
+            int listlen = currentList.Length;
+
+            Debug.LogError("sahne indexi: " + currentList);
+            Debug.LogError("sahne no : " + listlen);
+
 
             NetworkManager.singleton.ServerChangeScene(sceneName);
         }
         else
         {
-            Debug.LogError($"Geçersiz sahne indexi: {sceneIndex}");
+            string currentList = PlayerPrefs.GetString("SceneList","");
+            int listlen = currentList.Length;
+
+            Debug.LogError("Geçersiz  sahne indexi: " + currentList);
+            Debug.LogError("Geçersiz  sahne no : " + listlen);
+
+            // NetworkManager.singleton.ServerChangeScene("MainMenu");
+
+        }
+    }
+    public int FindNextScene()
+    {
+        string currentList = PlayerPrefs.GetString("SceneList", "");
+
+        if (string.IsNullOrEmpty(currentList))
+        {
+            Debug.LogWarning("SceneList boþ!");
+            return -1; // Liste boþsa -1 döner
+        }
+
+        // Ýlk karakteri al
+        char nextChar = currentList[0];
+
+        // Integer'a çevir
+        if (int.TryParse(nextChar.ToString(), out int nextScene))
+        {
+            // Kalan listeyi al ve kaydet
+            string updatedList = currentList.Substring(1);
+            PlayerPrefs.SetString("SceneList", updatedList);
+            PlayerPrefs.Save();
+
+            Debug.Log("Sonraki sahne: " + nextScene + " | Güncel Liste: " + updatedList);
+            return nextScene;
+        }
+        else
+        {
+            Debug.LogError("SceneList'teki karakter sayý deðil: " + nextChar);
+            return -1;
         }
     }
 
+
+    public void DisconnectSelfAndGoToMenu()
+    {
+        if (NetworkClient.isConnected)
+        {
+            Debug.Log("Disconnecting local client...");
+            NetworkManager.singleton.StopClient();
+        }
+
+        if (NetworkServer.active)
+        {
+            Debug.Log("Stopping local server (if host)...");
+            NetworkManager.singleton.StopHost(); // Güvence
+        }
+
+        Debug.Log("Loading MainMenu scene...");
+        SceneManager.LoadScene("MainMenu");
+    }
 }
